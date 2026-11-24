@@ -32,7 +32,6 @@ button, select, input { font: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .page {
-  max-width: 1680px; margin: 0 auto;
   padding: 80px clamp(20px, 5vw, 72px) 120px;
 }
 h1 {
@@ -40,13 +39,13 @@ h1 {
   letter-spacing: -0.03em; text-transform: uppercase;
 }
 
-/* 12-column grid, 24px gutter: settings on columns 1-4, pattern and readouts on 5-12. */
+/* Settings in a fixed column; the pattern and readouts take all the remaining width. */
 .layout {
-  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+  display: grid; grid-template-columns: 350px minmax(0, 1fr);
   column-gap: 24px; align-items: start;
 }
-.controls { grid-column: 1 / span 4; display: flex; flex-direction: column; gap: 72px; min-width: 0; }
-.output { grid-column: 5 / span 8; }
+.controls { grid-column: 1; display: flex; flex-direction: column; gap: 72px; min-width: 0; }
+.output { grid-column: 2; }
 .group { display: flex; flex-direction: column; gap: 28px; }
 .group h2 {
   margin: 0; display: flex; justify-content: space-between; align-items: baseline;
@@ -76,7 +75,6 @@ h1 {
   font-family: var(--font-mono); font-size: 10.5px; color: var(--muted);
   text-transform: uppercase; letter-spacing: 0.05em;
 }
-.pair { display: grid; grid-template-columns: minmax(0, 1fr) 124px; gap: 12px; align-items: center; }
 input[type="range"] { width: 100%; margin: 0; accent-color: var(--ink); }
 .num { position: relative; display: flex; align-items: center; }
 .num input { width: 100%; padding-right: 36px; }
@@ -148,7 +146,6 @@ input[type="number"] { font-family: var(--font-mono); }
   font-family: var(--font-mono); font-size: 11px; color: var(--muted);
   text-transform: uppercase; letter-spacing: 0.05em;
 }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
 button {
   font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
   cursor: pointer; border: 1px solid var(--ink); background: transparent; color: var(--ink);
@@ -157,8 +154,8 @@ button {
 button.primary { background: var(--ink); color: var(--bg); }
 button:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
-.canvas { width: 100%; overflow: hidden; min-height: 60px; }
-.canvas svg { display: block; width: 100%; height: auto; max-height: 60vh; }
+.canvas { width: 100%; overflow: visible; min-height: 60px; }
+.canvas svg { display: block; max-width: 100%; height: auto; max-height: 60vh; overflow: visible; margin: 0 auto; }
 .msg { font-size: 12px; color: var(--muted); min-height: 1em; margin: 0; }
 
 .compare { margin-top: 96px; border-top: 1px solid var(--ink); padding-top: 24px; display: flex; flex-direction: column; gap: 24px; }
@@ -214,6 +211,12 @@ details.group { display: block; }
 details.group > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; }
 details.group > summary::-webkit-details-marker { display: none; }
 details.group > summary h2 { display: inline; }
+details.group > summary .sumhead { display: inline-flex; align-items: center; gap: 10px; }
+.sumchk { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; margin: 0; border: 1px solid var(--ink); background: transparent; display: inline-grid; place-content: center; cursor: pointer; }
+.sumchk:checked::after { content: ""; width: 8px; height: 8px; background: var(--ink); }
+.check input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; margin: 0; border: 1px solid var(--ink); border-radius: 0; background: transparent; display: inline-grid; place-content: center; cursor: pointer; flex: none; }
+.check input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--ink); }
+.group-body.off { opacity: 0.4; }
 details.group > summary::after { content: "+"; font-family: var(--font-mono); font-size: 16px; color: var(--muted); }
 details.group[open] > summary::after { content: "\2212"; }
 .group-body { display: flex; flex-direction: column; gap: 28px; margin-top: 28px; }
@@ -230,13 +233,14 @@ details.group[open] > summary::after { content: "\2212"; }
 .controls .opt svg { width: 22px; height: 22px; }
 /* Array icons hold many small dots, so they get more room than the single-shape icons */
 .controls #arrayOpts .opt svg { width: 38px; height: 38px; }
-.controls .pair { grid-template-columns: minmax(0, 1fr) 100px; }
+.controls #shapeOpts { display: grid; grid-template-columns: repeat(3, 72px); }
+.opt .optText { font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
 /* Slider rows: title on the left, the slider in the middle of the same row, a small value box on the right */
-.controls .sl { display: grid; grid-template-columns: 124px minmax(0, 1fr) auto; align-items: center; gap: 10px 14px; }
+.controls .sl { display: grid; grid-template-columns: 114px minmax(0, 1fr) auto; align-items: center; gap: 10px 12px; }
 .controls .sl[hidden] { display: none; }
 .controls .sl > .ctrl-head { justify-content: flex-start; }
-.controls .sl > .num { width: 80px; }
-.controls .sl > .num input { height: 26px; font-size: 12px; padding: 0 26px 0 8px; }
+.controls .sl > .num { width: 68px; }
+.controls .sl > .num input { height: 26px; font-size: 12px; padding: 0 24px 0 7px; }
 .controls .sl > .num span { right: 7px; font-size: 9.5px; }
 .controls .sl > input[type="range"], .controls .sl > .tslider { grid-column: 2; grid-row: 1; min-width: 0; }
 /* every title gets the same column, so all sliders start at the same point; an extra checkbox wraps below its title */
@@ -315,16 +319,20 @@ td { font-size: 13px; }
 .tslider input[type="range"]:focus-visible { outline: none; }
 .num.dim.wide input { padding-left: 42px; }
 #contourWrap { margin-top: -12px; }
-.corners { display: flex; align-items: center; gap: 14px; }
-.corners .mini { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em; color: var(--muted); }
+.corners { display: flex; align-items: center; gap: 14px; margin-left: 6px; }
+.corners[hidden] { display: none; }
+.custom { display: flex; flex-direction: column; gap: 12px; }
+.custom[hidden] { display: none; }
+.customrow { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.customrow[hidden], .check[hidden] { display: none; }
+.controls #shapeOpts + .customrow { margin-top: -6px; }
+.customrow .cname { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .corners input[type="radio"] {
   -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin: 0; border: 1px solid var(--ink);
   border-radius: 0; background: var(--bg); cursor: pointer; display: grid; place-content: center;
 }
 .corners input[type="radio"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--ink); }
 /* Artboard handles */
-.canvas { overflow: visible; }
-.canvas svg { overflow: visible; }
 .canvas svg.selected { touch-action: none; }
 #panelShape, #holesPath { cursor: pointer; }
 .handles .sel { fill: none; stroke: var(--ink); stroke-width: 1.5; vector-effect: non-scaling-stroke; pointer-events: none; }
@@ -345,7 +353,8 @@ td { font-size: 13px; }
 .handles [data-gh="n"], .handles [data-gh="s"] { cursor: ns-resize; }
 .handles [data-gh="e"], .handles [data-gh="w"] { cursor: ew-resize; }
 .canvas.drawing { cursor: crosshair; }
-.controls > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+/* Two lines over the tool column; the size is fixed so "Perforation" fills the column at any window width. */
+@media (min-width: 901px) { .controls > header h1 { font-size: 44px; line-height: 0.92; white-space: nowrap; } }
 .ghost { background: transparent; }
 .gradWrap .opts { margin-bottom: 8px; }
 .handles [data-h="nw"], .handles [data-h="se"] { cursor: nwse-resize; }
@@ -364,6 +373,11 @@ td { font-size: 13px; }
 
         <div class="sub">Hole shape</div>
         <div class="opts" id="shapeOpts"></div>
+        <div class="customrow" id="customLoadRow" hidden>
+          <button type="button" id="customLoad" class="ghost">Load SVG…</button>
+          <span class="cname" id="customName"></span>
+          <input type="file" id="customFile" accept=".svg,image/svg+xml" hidden>
+        </div>
 
         <div class="sub" id="arraySub" hidden>Array</div>
         <div class="opts" id="arrayOpts" hidden></div>
@@ -379,24 +393,41 @@ td { font-size: 13px; }
         <div class="ctrl sl">
           <div class="ctrl-head">
             <label for="sizeN" id="sizeLabel">Hole diameter</label>
-            <label class="check" id="squareWrap" hidden><input type="checkbox" id="squareChk"> Square</label>
           </div>
           <div class="num"><input type="number" id="sizeN" min="0.05" step="0.01" value="1.0"><span>mm</span></div>
           <input type="range" id="sizeR" min="0.1" max="5" step="0.05" value="1" aria-label="Hole size slider">
         </div>
 
+        <div class="ctrl custom" id="customCtrl" hidden>
+          <div class="ctrl sl">
+            <div class="ctrl-head"><label for="customRot">Angle</label></div>
+            <div class="num"><input type="number" id="customRot" step="1" value="0"><span>°</span></div>
+            <input type="range" id="customRotR" min="-180" max="180" step="1" value="0" aria-label="Custom shape angle slider">
+          </div>
+          <label class="check" id="customRadialWrap" hidden><input type="checkbox" id="customRadial"> Point at centre</label>
+          <p class="note" id="customInfo" aria-live="polite"></p>
+        </div>
         <div class="ctrl sl" id="lengthCtrl" hidden>
           <div class="ctrl-head"><label for="lengthN">Hole length</label></div>
           <div class="num"><input type="number" id="lengthN" min="0.1" step="0.01" value="4.0"><span>mm</span></div>
           <input type="range" id="lengthR" min="0.5" max="20" step="0.1" value="4" aria-label="Hole length slider">
         </div>
+        <div class="ctrl sl" id="cornerCtrl" hidden>
+          <div class="ctrl-head"><label for="cornerN">Corner r</label></div>
+          <div class="num"><input type="number" id="cornerN" min="0" step="0.05" value="0.5"><span>mm</span></div>
+          <input type="range" id="cornerR" min="0" max="0.5" step="0.01" value="0.5" aria-label="Corner radius slider">
+        </div>
+        <div class="ctrl sl" id="ringsCtrl" hidden>
+          <div class="ctrl-head"><label for="ringsN">Rings</label></div>
+          <div class="num"><input type="number" id="ringsN" min="1" max="20" step="1" value="1"><span>rows</span></div>
+          <input type="range" id="ringsR" min="1" max="10" step="1" value="1" aria-label="Rings slider">
+        </div>
 
       </div>
 
       <details class="group" id="gradient">
-        <summary><h2>Gradient</h2></summary>
+        <summary><span class="sumhead"><h2>Gradient</h2><input type="checkbox" id="gradOn" class="sumchk" aria-label="Gradient on"></span></summary>
         <div class="group-body gradWrap">
-          <label class="check"><input type="checkbox" id="gradOn"> Enable gradient</label>
           <div class="sub">Fade area</div>
           <div class="opts" id="gradShapeOpts"></div>
           <div class="ctrl" style="display:flex; gap:8px;">
@@ -408,16 +439,16 @@ td { font-size: 13px; }
             <input type="range" id="gradFalloffR" min="1" max="80" step="0.5" value="15" aria-label="Fade distance slider">
           </div>
           <div class="ctrl sl" id="gradOffsetWrap" hidden>
-            <div class="ctrl-head"><label for="gradOffsetN">Offset from panel edge</label></div>
+            <div class="ctrl-head"><label for="gradOffsetN">Edge offset</label></div>
             <div class="num"><input type="number" id="gradOffsetN" min="0" step="0.5" value="5"><span>mm</span></div>
             <input type="range" id="gradOffsetR" min="0" max="40" step="0.5" value="5" aria-label="Offset slider">
           </div>
           <p class="msg" id="gradMsg" aria-live="polite"></p>
-          <p class="note">Holes inside the grey area stay full size; outward, over the fade distance, they shrink toward the smallest size the limits allow. While you set the fade distance, the lighter band shows that zone. Target open area is matched on average, so the actual value may differ — shown as measured. Click a shape to place it, drag the area to move it (it snaps to the panel's centre lines), drag its handles to resize or the top handle to rotate, or drag on the panel to draw a new one.</p>
+          <p class="note">Holes inside the grey area keep their full size; outside it they shrink over the fade distance. The pitch is set for full-size holes, so the real open area drops.</p>
         </div>
       </details>
       <details class="group" id="constraints">
-        <summary><h2>Constraints</h2></summary>
+        <summary><span class="sumhead"><h2>Constraints</h2><input type="checkbox" id="consOn" class="sumchk" checked aria-label="Manufacturing limits on"></span></summary>
         <div class="group-body">
         <div class="ctrl">
           <label for="material">Material</label>
@@ -439,7 +470,7 @@ td { font-size: 13px; }
           </div>
         </div>
 
-        <p class="note">Pitch is solved from hole size and target open area, rounded to 0.01 mm. Manufacturing limits are rules of thumb; confirm with your supplier.</p>
+        <p class="note">Pitch is solved from hole size and target open area and set on a 0.1 mm grid, rounded down so the open area is never below the target. Manufacturing limits are rules of thumb; confirm with your supplier. Untick Constraints to draw without them.</p>
       
         </div>
       </details>
@@ -459,18 +490,17 @@ td { font-size: 13px; }
               <div class="num dim"><b aria-hidden="true">H</b><input id="ph" type="number" min="1" step="1" value="50" aria-label="Panel height (mm)"><span>mm</span></div>
             </div>
             <div class="dims" id="panelExtra">
-              <div class="num dim" title="Corner radius of the panel"><b aria-hidden="true">R</b><input id="prc" type="number" min="0" step="0.5" value="0" aria-label="Panel corner radius (mm)"><span>mm</span></div>
               <div class="num dim wide" title="Unperforated margin between the panel edge and the holes"><b aria-hidden="true">Edge</b><input id="pm" type="number" min="0" step="0.5" value="0" aria-label="Edge margin (mm)"><span>mm</span></div>
+              <div class="num dim" title="Corner radius of the panel"><b aria-hidden="true">R</b><input id="prc" type="number" min="0" step="0.5" value="0" aria-label="Panel corner radius (mm)"><span>mm</span></div>
+              <div class="corners" id="cornerGroup" role="radiogroup" aria-label="Corner continuity">
+                <label class="check" title="Circular arc: tangent to the sides"><input type="radio" name="corner" value="G1" checked> G1</label>
+                <label class="check" title="Curvature continuous"><input type="radio" name="corner" value="G2"> G2</label>
+                <label class="check" title="Curvature and its change continuous"><input type="radio" name="corner" value="G3"> G3</label>
+              </div>
             </div>
             <div class="dims" id="gradRotRow" hidden>
               <div class="num dim wide" title="Rotation of the gradient area"><b aria-hidden="true">Angle</b><input id="gradRot" type="number" step="1" value="0" aria-label="Gradient area rotation (degrees)"><span>°</span></div>
             </div>
-            </div>
-            <div class="corners" id="cornerGroup" role="radiogroup" aria-label="Corner continuity">
-              <span class="mini">Corner</span>
-              <label class="check" title="Circular arc: tangent to the sides"><input type="radio" name="corner" value="G1" checked> G1</label>
-              <label class="check" title="Curvature continuous"><input type="radio" name="corner" value="G2"> G2</label>
-              <label class="check" title="Curvature and its change continuous"><input type="radio" name="corner" value="G3"> G3</label>
             </div>
           </fieldset>
           <div class="export">
@@ -515,17 +545,22 @@ td { font-size: 13px; }
   var MAX_PREVIEW = 60000;
 
   var MATERIALS = {
-    al: { name: "aluminium", thickness: 0.8, processes: ["punch", "cnc"] },
-    sus: { name: "stainless steel", thickness: 0.8, processes: ["punch", "cnc"] },
+    al: { name: "aluminium", thickness: 0.8, processes: ["punch", "laser", "cnc"] },
+    sus: { name: "stainless steel", thickness: 0.8, processes: ["punch", "laser", "cnc"] },
     plastic: { name: "plastic", thickness: 1.5, processes: ["injection", "cnc"] }
   };
-  var PROCESS_NAMES = { punch: "Punching", cnc: "CNC", injection: "Injection" };
+  var PROCESS_NAMES = { punch: "Punching", laser: "Laser cutting", cnc: "CNC", injection: "Injection" };
 
   // Rules of thumb. h/b: minimum hole size / bridge (mm), or a multiple of thickness when tMul is set. d: max thickness-to-hole ratio.
   var RULES = {
     punch: {
       al: { h: 1.0, b: 1.0, tMul: true, d: null },
       sus: { h: 1.5, b: 1.5, tMul: true, d: null }
+    },
+    // Laser: holes and the web between them at least one thickness; dense grilles also heat and warp thin sheet.
+    laser: {
+      al: { h: 1.0, b: 1.0, tMul: true, d: null },
+      sus: { h: 1.0, b: 1.0, tMul: true, d: null }
     },
     cnc: {
       al: { h: 0.5, b: 0.5, d: 5 },
@@ -540,40 +575,39 @@ td { font-size: 13px; }
   // Hole shape -> the array types that exist for it. Only these combinations are offered.
   var SHAPE_DEF = {
     round: { name: "Round", shape: "round", label: "Hole diameter", arrays: ["round-tri", "round-sq", "round-sun", "round-ring"] },
-    slot: { name: "Slot", shape: "slot", label: "Slot width", arrays: ["slot-sq", "slot-stag", "slot-band"], needsL: true },
-    rect: { name: "Rectangle", shape: "rect", label: "Hole width", arrays: ["rect-sq", "rect-stag"], needsL: true },
-    hex: { name: "Hexagon", shape: "hex", label: "Across flats", arrays: ["hex"] }
+    square: { name: "Square", shape: "square", label: "Side length", arrays: ["sq-sq", "sq-stag"] },
+    slot: { name: "Slot", shape: "slot", label: "Slot width", arrays: ["slot-sq", "slot-stag", "slot-band"], needsL: true, corner: true },
+    hex: { name: "Hexagon", shape: "hex", label: "Across flats", arrays: ["hex"] },
+    // A shape from an SVG file, laid out with the round arrays. Its size is the diameter of the circle of equal area.
+    custom: { name: "Custom", shape: "custom", label: "Equivalent Ø", arrays: ["round-tri", "round-sq", "round-sun", "round-ring"], custom: true }
   };
   var ARR_DEF = {
-    "round-tri": { name: "Triangular (60°)", icon: "tri" },
-    "round-sq": { name: "Square", icon: "sq" },
+    "round-tri": { name: "Staggered 60°", icon: "tri" },
+    "round-sq": { name: "Grid", icon: "sq" },
     "round-sun": { name: "Sunflower", icon: "sun", radial: true },
     "round-ring": { name: "Concentric", icon: "ring", radial: true },
     "round-contour": { name: "Contour", icon: "contour", radial: true },
-    "sq-sq": { name: "Square", icon: "sq" },
+    "sq-sq": { name: "Grid", icon: "sq" },
     "sq-stag": { name: "Staggered", icon: "stag" },
-    "slot-sq": { name: "Square", icon: "sq" },
+    "slot-sq": { name: "Grid", icon: "sq" },
     "slot-stag": { name: "Staggered", icon: "stag" },
-    "slot-band": { name: "Single ring", icon: "band", radial: true },
-    "rect-sq": { name: "Square", icon: "sq" },
-    "rect-stag": { name: "Staggered", icon: "stag" },
+    "slot-band": { name: "Rings", icon: "band", radial: true },
     "hex": { name: "Hexagonal", icon: "hex" }
   };
   var PATTERN_SHAPE = {};
   Object.keys(SHAPE_DEF).forEach(function (k) {
+    if (SHAPE_DEF[k].custom) return; // custom shares the round arrays; the shape is taken from S.shape
     SHAPE_DEF[k].arrays.forEach(function (a) { PATTERN_SHAPE[a] = SHAPE_DEF[k].shape; });
   });
-  // Square holes are the Rectangle shape with the Square box ticked.
-  var SQUARE_DEF = { name: "Square", label: "Hole side", arrays: ["sq-sq", "sq-stag"] };
-  SQUARE_DEF.arrays.forEach(function (a) { PATTERN_SHAPE[a] = "square"; });
   // Contour is the round Square array with the Contour box ticked.
   PATTERN_SHAPE["round-contour"] = "round";
 
   var SHAPE_ICON = {
     round: '<circle cx="20" cy="20" r="12"/>',
+    square: '<rect x="9" y="9" width="22" height="22"/>',
     slot: '<rect x="3" y="14" width="34" height="12" rx="6"/>',
-    rect: '<rect x="6" y="11" width="28" height="18"/>',
-    hex: '<polygon points="' + hexPts(20, 20, 12) + '"/>'
+    hex: '<polygon points="' + hexPts(20, 20, 12) + '"/>',
+    custom: "" // drawn from the loaded shape
   };
   function hexPts(cx, cy, r) {
     var p = [];
@@ -583,18 +617,6 @@ td { font-size: 13px; }
     }
     return p.join(" ");
   }
-  function dots(pts) {
-    return pts.map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2.6"/>'; }).join("");
-  }
-  var ARR_ICON = {
-    tri: dots([[9, 11], [20, 11], [31, 11], [14.5, 20.5], [25.5, 20.5], [9, 30], [20, 30], [31, 30]]),
-    sq: dots([[9, 9], [20, 9], [31, 9], [9, 20], [20, 20], [31, 20], [9, 31], [20, 31], [31, 31]]),
-    stag: '<rect x="4" y="8" width="10" height="4" rx="2"/><rect x="20" y="8" width="10" height="4" rx="2"/>' +
-          '<rect x="12" y="18" width="10" height="4" rx="2"/><rect x="28" y="18" width="10" height="4" rx="2"/>' +
-          '<rect x="4" y="28" width="10" height="4" rx="2"/><rect x="20" y="28" width="10" height="4" rx="2"/>',
-    hex: [[10, 10], [22, 10], [34, 10], [16, 21], [28, 21], [10, 32], [22, 32], [34, 32]]
-      .map(function (p) { return '<polygon points="' + hexPts(p[0], p[1], 4.6) + '"/>'; }).join("")
-  };
 
   var $ = function (id) { return document.getElementById(id); };
   var r2 = function (x) { return Math.round(x * 100) / 100; };
@@ -602,18 +624,210 @@ td { font-size: 13px; }
   var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; };
 
   // Current pattern selection
-  var S = { shape: "round", pattern: "round-tri", square: false, contour: false, arrOpen: false };
+  var S = { shape: "round", pattern: "round-tri", contour: false, arrOpen: false, rFull: true };
   function effPattern() { return S.pattern === "round-sq" && S.contour ? "round-contour" : S.pattern; }
-  function curDef() { return S.shape === "rect" && S.square ? SQUARE_DEF : SHAPE_DEF[S.shape]; }
+  function curDef() { return SHAPE_DEF[S.shape]; }
+  // Slot corner radius for slot width s: at its largest (the slider at the right end) it follows the width,
+  // which is a round-ended slot; 0 is a sharp rectangle.
+  function slotR(s) { return S.rFull ? s / 2 : Math.max(0, Math.min(num("cornerN") || 0, s / 2)); }
 
   function holeArea(shape, s, L) {
     switch (shape) {
       case "round": return Math.PI * s * s / 4;
       case "square": return s * s;
-      case "slot": return s * L - (1 - Math.PI / 4) * s * s;
-      case "rect": return s * L;
+      case "slot": var r = slotR(s); return s * L - (4 - Math.PI) * r * r;
       case "hex": return SQ3 / 2 * s * s;
+      case "custom": return Math.PI * s * s / 4; // s is the diameter of the circle of equal area
     }
+  }
+
+  // ---------- Custom hole shape ----------
+  // The shape is stored at "unit" size: centred on its centroid, area pi/4 (a circle of equal area has diameter 1),
+  // y-up, counter-clockwise. draw: up to ~240 points for drawing and export; coarse: ~40 points for distance
+  // checks; rc: farthest point from the centre. A hole of equivalent diameter s is the unit shape times s.
+  var CUSTOM = null;
+  function polyArea(P) { var a = 0; for (var i = 0, n = P.length; i < n; i++) { var p = P[i], q = P[(i + 1) % n]; a += p[0] * q[1] - q[0] * p[1]; } return a / 2; }
+  function polyCentroid(P) {
+    var a = 0, cx = 0, cy = 0;
+    for (var i = 0, n = P.length; i < n; i++) { var p = P[i], q = P[(i + 1) % n], c = p[0] * q[1] - q[0] * p[1]; a += c; cx += (p[0] + q[0]) * c; cy += (p[1] + q[1]) * c; }
+    return [cx / (3 * a), cy / (3 * a)];
+  }
+  function inPoly(P, x, y) {
+    var inside = false;
+    for (var i = 0, j = P.length - 1; i < P.length; j = i++) {
+      var a = P[i], b = P[j];
+      if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside;
+    }
+    return inside;
+  }
+  // Ramer-Douglas-Peucker on a closed outline, so corners are kept and straight runs drop their extra points.
+  function simplify(P, tol) {
+    function rdp(pts) {
+      if (pts.length < 3) return pts;
+      var a = pts[0], b = pts[pts.length - 1], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1e-12, best = 0, bi = 0;
+      for (var i = 1; i < pts.length - 1; i++) { var d = Math.abs((pts[i][0] - a[0]) * dy - (pts[i][1] - a[1]) * dx) / L; if (d > best) { best = d; bi = i; } }
+      if (best <= tol) return [a, b];
+      return rdp(pts.slice(0, bi + 1)).slice(0, -1).concat(rdp(pts.slice(bi)));
+    }
+    var far = 0, fi = 0;
+    for (var i = 1; i < P.length; i++) { var d = Math.hypot(P[i][0] - P[0][0], P[i][1] - P[0][1]); if (d > far) { far = d; fi = i; } }
+    var A = rdp(P.slice(0, fi + 1)), B = rdp(P.slice(fi).concat([P[0]]));
+    return A.slice(0, -1).concat(B.slice(0, -1));
+  }
+  function simplifyTo(P, maxN, tol) { var out = simplify(P, tol); while (out.length > maxN) { tol *= 1.6; out = simplify(P, tol); } return out; }
+  function makeCustom(P, name, notes) {
+    if (polyArea(P) < 0) P = P.slice().reverse();
+    var c = polyCentroid(P), k = Math.sqrt((Math.PI / 4) / Math.abs(polyArea(P)));
+    var U = P.map(function (p) { return [(p[0] - c[0]) * k, (p[1] - c[1]) * k]; });
+    var rc = 0, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    U.forEach(function (p) { rc = Math.max(rc, Math.hypot(p[0], p[1])); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+    var draw = simplifyTo(U, 240, 0.0015), coarse = simplifyTo(U, 40, 0.006);
+    return { name: name, draw: draw, coarse: coarse, rc: rc, w: x1 - x0, h: y1 - y0, notes: notes || [], thin: {} };
+  }
+  // Until a file is loaded: a soft six-lobed flower.
+  CUSTOM = makeCustom((function () { var o = []; for (var i = 0; i < 180; i++) { var t = 2 * Math.PI * i / 180, r = 1 + 0.22 * Math.cos(6 * t); o.push([r * Math.cos(t), r * Math.sin(t)]); } return o; })(), "Sample flower");
+
+  // Read an SVG file: every filled outline is sampled in the file's own coordinates (transforms included).
+  // The largest closed outline becomes the hole; cut-outs inside it and any other shapes are left out.
+  function parseCustomSVG(text, name) {
+    var doc = new DOMParser().parseFromString(text, "image/svg+xml"), src = doc.documentElement;
+    if (!src || src.nodeName.toLowerCase() !== "svg" || doc.getElementsByTagName("parsererror").length) throw new Error("This file is not a readable SVG.");
+    var host = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    host.setAttribute("style", "position:absolute;left:-10000px;top:0;width:10px;height:10px;visibility:hidden");
+    host.appendChild(document.importNode(src, true));
+    document.body.appendChild(host);
+    var contours = [];
+    try {
+      var els = host.querySelectorAll("path, polygon, polyline, rect, circle, ellipse");
+      Array.prototype.forEach.call(els, function (el) {
+        if (el.closest("defs, clipPath, mask, symbol, marker, pattern")) return;
+        var len = 0; try { len = el.getTotalLength(); } catch (e) { return; }
+        if (!(len > 0)) return;
+        var n = Math.min(4000, Math.max(400, Math.round(len * 4))), step = len / n, m = el.getCTM(), cur = [], prev = null;
+        for (var i = 0; i <= n; i++) {
+          var q = el.getPointAtLength(Math.min(len, i * step)), x = m ? m.a * q.x + m.c * q.y + m.e : q.x, y = m ? m.b * q.x + m.d * q.y + m.f : q.y;
+          // a jump much longer than one step is a new subpath (a move command)
+          if (prev && Math.hypot(x - prev[0], y - prev[1]) > 6 * step * (m ? Math.hypot(m.a, m.b) : 1) + 1e-9) { if (cur.length > 2) contours.push(cur); cur = []; }
+          cur.push([x, -y]); prev = [x, y]; // y-up
+        }
+        if (cur.length > 2) contours.push(cur);
+      });
+    } finally { document.body.removeChild(host); }
+    if (!contours.length) throw new Error("No closed shape was found in this SVG.");
+    contours.forEach(function (c) { c.area = Math.abs(polyArea(c)); });
+    contours.sort(function (a, b) { return b.area - a.area; });
+    var main = contours[0], inner = 0, other = 0;
+    contours.slice(1).forEach(function (c) { if (c.area < main.area * 1e-4) return; var cc = polyCentroid(c); if (inPoly(main, cc[0], cc[1])) inner++; else other++; });
+    var notes = [];
+    if (inner) notes.push(inner + " cut-out" + (inner > 1 ? "s" : "") + " inside the shape left out (the middle would fall out).");
+    if (other) notes.push(other + " other shape" + (other > 1 ? "s" : "") + " in the file left out: the largest one is used.");
+    var made = makeCustom(main, name, notes); made.loaded = true;
+    return made;
+  }
+
+  // One hole's outline in the panel frame (y-up). Turned by the Angle; on Sunflower and Concentric, with
+  // "Point at centre", each hole is also turned so its top faces the middle of the panel.
+  function customAngle(sol, x, y, cc) {
+    var a = (num("customRot") || 0) * Math.PI / 180;
+    if ($("customRadial").checked && (sol.pattern === "round-sun" || sol.pattern === "round-ring") && cc) {
+      var dx = cc.x - x, dy = cc.y - y;
+      if (Math.hypot(dx, dy) > 1e-9) a += Math.atan2(dy, dx) - Math.PI / 2;
+    }
+    return a;
+  }
+  function customPoly(sol, x, y, k, coarse, cc) {
+    var a = customAngle(sol, x, y, cc), c = Math.cos(a), sn = Math.sin(a), sc = sol.s * (k || 1);
+    return (coarse ? CUSTOM.coarse : CUSTOM.draw).map(function (p) { var u = p[0] * sc, v = p[1] * sc; return [x + u * c - v * sn, y + u * sn + v * c]; });
+  }
+  function segDist(a, b, c, d) {
+    function ccw(p, q, r) { return (r[1] - p[1]) * (q[0] - p[0]) - (q[1] - p[1]) * (r[0] - p[0]); }
+    var d1 = ccw(a, b, c), d2 = ccw(a, b, d), d3 = ccw(c, d, a), d4 = ccw(c, d, b);
+    if (((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0))) return 0;
+    function pt(p, q, r) { var dx = r[0] - q[0], dy = r[1] - q[1], l = dx * dx + dy * dy, t = l ? Math.max(0, Math.min(1, ((p[0] - q[0]) * dx + (p[1] - q[1]) * dy) / l)) : 0; return Math.hypot(p[0] - q[0] - t * dx, p[1] - q[1] - t * dy); }
+    return Math.min(pt(a, c, d), pt(b, c, d), pt(c, a, b), pt(d, a, b));
+  }
+  // Closest distance between two outlines (0 when they touch or overlap).
+  function polyDist(P, Q) {
+    if (inPoly(Q, P[0][0], P[0][1]) || inPoly(P, Q[0][0], Q[0][1])) return 0;
+    var m = Infinity;
+    for (var i = 0; i < P.length; i++) { var a = P[i], b = P[(i + 1) % P.length]; for (var j = 0; j < Q.length; j++) { m = Math.min(m, segDist(a, b, Q[j], Q[(j + 1) % Q.length])); if (!m) return 0; } }
+    return m;
+  }
+  // Bridge of a custom array, outline to outline. The lattices repeat one hole by fixed steps, so the gap to
+  // each neighbour step is exact (Contour is taken as its p x p grid). Sunflower and Concentric have no
+  // repeating step: a small patch of the array is laid out around its centre, where the holes are closest,
+  // and measured; the render then measures the whole layout.
+  function customBridge(o) {
+    var P, m = Infinity, pts = [], i, k;
+    if (o.pattern === "round-tri" || o.pattern === "round-sq" || o.pattern === "round-contour") {
+      var dx = o.dx || o.p, dy = o.dy || o.p;
+      var steps = o.pattern === "round-tri" ? [[dx, 0], [dx / 2, dy], [-dx / 2, dy]] : [[dx, 0], [0, dy], [dx, dy], [dx, -dy]];
+      P = customPoly(o, 0, 0, 1, true, null);
+      steps.forEach(function (v) { m = Math.min(m, polyDist(P, P.map(function (p) { return [p[0] + v[0], p[1] + v[1]]; }))); });
+      o.bridge = m;
+      return;
+    }
+    if (o.pattern === "round-sun") for (i = 0; i < 60; i++) { var r = o.c * Math.sqrt(i + 0.5), a = Math.PI / 2 + i * GOLDEN; pts.push(r * Math.cos(a), r * Math.sin(a)); }
+    else { pts.push(0, 0); for (k = 1; k <= 3; k++) for (i = 0; i < 6 * k; i++) { var b = Math.PI / 2 + 2 * Math.PI * i / (6 * k); pts.push(k * o.p * Math.cos(b), k * o.p * Math.sin(b)); } }
+    m = measureCustomGap(o, pts, { x: 0, y: 0 });
+    if (isFinite(m)) o.bridge = m;
+  }
+  // Smallest gap between neighbouring holes as laid out (radial arrays). Only pairs whose outer circles come
+  // closer than the best gap so far are measured outline to outline.
+  function measureCustomGap(sol, pts, cc) {
+    var n = pts.length / 2; if (n < 2 || n > 4000) return NaN;
+    var R = CUSTOM.rc * sol.s, cell = 2 * R + 2 * sol.s, grid = {}, best = Infinity, polys = [];
+    function poly(i) { return polys[i] || (polys[i] = customPoly(sol, pts[2 * i], pts[2 * i + 1], 1, true, cc)); }
+    for (var i = 0; i < n; i++) {
+      var x = pts[2 * i], y = pts[2 * i + 1], gx = Math.floor(x / cell), gy = Math.floor(y / cell);
+      for (var a = gx - 1; a <= gx + 1; a++) for (var b = gy - 1; b <= gy + 1; b++) {
+        var list = grid[a + "," + b]; if (!list) continue;
+        for (var t = 0; t < list.length; t++) {
+          var j = list[t], dc = Math.hypot(x - pts[2 * j], y - pts[2 * j + 1]);
+          if (dc - 2 * R >= best) continue;
+          best = Math.min(best, polyDist(poly(i), poly(j)));
+        }
+      }
+      (grid[gx + "," + gy] || (grid[gx + "," + gy] = [])).push(i);
+    }
+    return best;
+  }
+  // Share of the shape (at equivalent diameter s) in parts narrower than w: what an opening with a w-wide
+  // round tool cannot reach. Worked out on a 160 px raster with chamfer distances; cached per size.
+  function customThin(s, w) {
+    var key = s.toFixed(3) + "/" + w.toFixed(3); if (key in CUSTOM.thin) return CUSTOM.thin[key];
+    var P = CUSTOM.draw.map(function (p) { return [p[0] * s, p[1] * s]; }), N = 160;
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    P.forEach(function (p) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); });
+    var px = Math.max(x1 - x0, y1 - y0) / (N - 4), W = Math.ceil((x1 - x0) / px) + 4, H = Math.ceil((y1 - y0) / px) + 4;
+    var inside = new Uint8Array(W * H), INF = 1e9, d = new Float32Array(W * H), e = new Float32Array(W * H), total = 0, i, x, y;
+    for (y = 0; y < H; y++) for (x = 0; x < W; x++) { i = y * W + x; inside[i] = inPoly(P, x0 + (x - 2 + 0.5) * px, y0 + (y - 2 + 0.5) * px) ? 1 : 0; total += inside[i]; }
+    function chamfer(dist) {
+      var a = 1, b = Math.SQRT2;
+      for (y = 0; y < H; y++) for (x = 0; x < W; x++) { i = y * W + x; var v = dist[i];
+        if (x > 0) v = Math.min(v, dist[i - 1] + a); if (y > 0) { v = Math.min(v, dist[i - W] + a); if (x > 0) v = Math.min(v, dist[i - W - 1] + b); if (x < W - 1) v = Math.min(v, dist[i - W + 1] + b); } dist[i] = v; }
+      for (y = H - 1; y >= 0; y--) for (x = W - 1; x >= 0; x--) { i = y * W + x; var u = dist[i];
+        if (x < W - 1) u = Math.min(u, dist[i + 1] + a); if (y < H - 1) { u = Math.min(u, dist[i + W] + a); if (x < W - 1) u = Math.min(u, dist[i + W + 1] + b); if (x > 0) u = Math.min(u, dist[i + W - 1] + b); } dist[i] = u; }
+    }
+    for (i = 0; i < W * H; i++) d[i] = inside[i] ? INF : 0;
+    chamfer(d);
+    var r = w / 2 / px;
+    for (i = 0; i < W * H; i++) e[i] = inside[i] && d[i] >= r ? 0 : INF; // centres where the round tool fits
+    chamfer(e);
+    var miss = 0; for (i = 0; i < W * H; i++) if (inside[i] && e[i] > r + 0.5) miss++;
+    return (CUSTOM.thin[key] = total ? miss / total : 0);
+  }
+
+  // Thin parts scale with the shape, so one ratio decides them: the widest round tool (as a share of the equivalent
+  // diameter) that still reaches all but THIN_MAX of the shape. A hole of size s passes when the minimum hole
+  // size is at most s times this ratio. Worked out once per shape.
+  var THIN_MAX = 0.05;
+  function customThinRatio() {
+    if (CUSTOM.thinR !== undefined) return CUSTOM.thinR;
+    var lo = 0.001, hi = 1, i;
+    if (customThin(1, lo) > THIN_MAX) return (CUSTOM.thinR = lo);
+    for (i = 0; i < 14; i++) { var mid = (lo + hi) / 2; if (customThin(1, mid) <= THIN_MAX) lo = mid; else hi = mid; }
+    return (CUSTOM.thinR = lo);
   }
 
   // Solve the pitch for a target open area (fraction f). Returns lattice data.
@@ -637,8 +851,9 @@ td { font-size: 13px; }
   }
   function solve(pattern, s, L, f) {
     var shape = PATTERN_SHAPE[pattern];
+    if (shape === "round" && S.shape === "custom") shape = "custom";
     var A = holeArea(shape, s, L);
-    var o = { pattern: pattern, shape: shape, s: s, L: L, A: A };
+    var o = { pattern: pattern, shape: shape, s: s, L: L, A: A, r: shape === "slot" ? slotR(s) : 0 };
     if (pattern === "round-tri") {
       var T = gridPitch(Math.sqrt(A / (f * SQ3 / 2)), s);
       o.cell = SQ3 / 2 * T * T; o.bridge = T - s; o.dx = T; o.dy = T * SQ3 / 2; o.off = T / 2;
@@ -651,7 +866,7 @@ td { font-size: 13px; }
       var Z1 = gridPitch(Math.sqrt(A / f), s);
       o.cell = Z1 * Z1; o.bridge = Z1 - s; o.dx = Z1; o.dy = Z1; o.off = Z1 / 2;
       o.hx = s / 2; o.hy = s / 2; o.max = 1; o.pitch = [["Z1", Z1], ["Z2", 2 * Z1]];
-    } else if (pattern === "slot-stag" || pattern === "rect-stag" || pattern === "slot-sq" || pattern === "rect-sq") {
+    } else if (pattern === "slot-stag" || pattern === "slot-sq") {
       // Equal end and side bridge b: cell = (s + b)(L + b). Square arrays line the rows up; staggered arrays shift every other row by half a pitch.
       var K = A / f, q2 = s + L, q = s * L - K;
       var disc = q2 * q2 - 4 * q;
@@ -685,7 +900,7 @@ td { font-size: 13px; }
       o.hx = s / 2; o.hy = s / 2; o.max = A / (s * s);
       o.pitch = [["p", Pc]];
     } else if (pattern === "slot-band") {
-      // One row of slots on the largest circle that fits the panel, each slot pointing at the centre.
+      // Rings of slots from the edge inward, each slot pointing at the centre.
       // How many slots fit depends on the panel, so the pitch and bridge are measured in layoutBand().
       o.radial = true; o.band = true; o.f = f; o.cell = 1; o.bridge = 1;
       o.hx = L / 2; o.hy = L / 2; o.max = 1; o.pitch = [["g", 0]];
@@ -694,14 +909,17 @@ td { font-size: 13px; }
       o.cell = SQ3 / 2 * P * P; o.bridge = P - s; o.dx = P; o.dy = P * SQ3 / 2; o.off = P / 2;
       o.hx = s / 2; o.hy = s / SQ3; o.max = 1; o.pitch = [["p", P]];
     }
+    if (shape === "custom") customBridge(o);
     o.bridge = r2(o.bridge);
     o.ok = o.bridge >= 0.01 && isFinite(o.cell) && o.cell > 0;
     o.achieved = o.ok ? o.A / o.cell : NaN;
     return o;
   }
 
+  function limitsOn() { return $("consOn").checked; }
   function checkRules(material, process, t, sol) {
     var out = [];
+    if (!limitsOn()) return out;
     var rule = RULES[process] && RULES[process][material];
     if (!rule || !sol.ok) return out;
     var minH = rule.tMul ? rule.h * t : rule.h;
@@ -712,6 +930,10 @@ td { font-size: 13px; }
     var bNote = rule.tMul ? " (" + rule.b.toFixed(1) + " × thickness)" : "";
     if (sol.s < minH - 1e-9) out.push("Hole " + f2(sol.s) + " mm is below the " + f2(minH) + " mm minimum for " + pn + " " + mn + tNote + ".");
     if (sol.bridge < minB - 1e-9) out.push("Bridge " + f2(sol.bridge) + " mm is below the " + f2(minB) + " mm minimum for " + pn + " " + mn + bNote + ".");
+    if (sol.shape === "custom") {
+      var thin = customThin(sol.s, minH);
+      if (sol.s * customThinRatio() < minH - 1e-9) out.push("About " + Math.round(thin * 100) + " % of the custom shape is in parts narrower than the " + f2(minH) + " mm minimum for " + pn + " " + mn + tNote + " (thin arms or sharp tips). Make the shape larger or its narrow parts wider.");
+    }
     if (rule.d && t > rule.d * sol.s + 1e-9) out.push("Thickness " + f2(t) + " mm is more than " + rule.d + " × the hole size; small tools or core pins may deflect or break.");
     return out;
   }
@@ -776,15 +998,39 @@ td { font-size: 13px; }
     var dx = x - cc.x, dy = y - cc.y, l = Math.hypot(dx, dy);
     return l > 1e-9 ? { x: dx / l, y: dy / l } : { x: 0, y: 1 };
   }
+  // Outline of a slot centred on (x, y), long axis along unit (ux, uy): vertices [x, y, bulge] in the
+  // y-up frame, counter-clockwise; a bulge of tan(22.5 deg) is a quarter arc. r = 0 gives a sharp rectangle,
+  // r = s / 2 a round-ended slot.
+  var QB = Math.tan(Math.PI / 8);
+  function slotVerts(x, y, ux, uy, L, s, r) {
+    var a = L / 2, w = s / 2, nx = -uy, ny = ux, raw = [
+      [-a + r, -w, 0], [a - r, -w, QB], [a, -w + r, 0], [a, w - r, QB], [a - r, w, 0], [-a + r, w, QB], [-a, w - r, 0], [-a, -w + r, QB]
+    ], out = [];
+    raw.forEach(function (v, i) {
+      var nxt = raw[(i + 1) % raw.length];
+      if (Math.abs(v[0] - nxt[0]) < 1e-9 && Math.abs(v[1] - nxt[1]) < 1e-9) return; // zero-length side or corner
+      out.push([x + v[0] * ux + v[1] * nx, y + v[0] * uy + v[1] * ny, r > 1e-9 ? v[2] : 0]);
+    });
+    return out;
+  }
+  function slotAxis(sol, x, y) { return sol.radial ? slotUnit(sol.cc || { x: 0, y: 0 }, x, y) : { x: 1, y: 0 }; }
   // Is the whole hole inside the perforated area?
   function holeInside(sol, z, x, y) {
     var s = sol.s, h = s / 2;
     if (sol.shape === "round") return inZone(z, x, y, h);
-    if (sol.shape === "slot" && sol.radial) {
-      var u = slotUnit({ x: z.cx, y: z.cy }, x, y), er = sol.L / 2 - h;
-      return inZone(z, x - er * u.x, y - er * u.y, h) && inZone(z, x + er * u.x, y + er * u.y, h);
+    if (sol.shape === "custom") {
+      if (!inZone(z, x, y, 0)) return false;
+      var cp = customPoly(sol, x, y, 1, true, { x: z.cx, y: z.cy });
+      for (var ci = 0; ci < cp.length; ci++) if (!inZone(z, cp[ci][0], cp[ci][1], 0)) return false;
+      return true;
     }
-    if (sol.shape === "slot") { var e = sol.L / 2 - h; return inZone(z, x - e, y, h) && inZone(z, x + e, y, h); }
+    if (sol.shape === "slot") {
+      // the slot is its inner rectangle grown by r, so its four inner corners with clearance r decide it
+      var u = sol.radial ? slotUnit({ x: z.cx, y: z.cy }, x, y) : { x: 1, y: 0 }, r = sol.r, ea = sol.L / 2 - r, eb = h - r;
+      for (var sa = -1; sa <= 1; sa += 2) for (var sb = -1; sb <= 1; sb += 2)
+        if (!inZone(z, x + sa * ea * u.x - sb * eb * u.y, y + sa * ea * u.y + sb * eb * u.x, r)) return false;
+      return true;
+    }
     if (sol.shape === "hex") {
       var R = s / SQ3;
       for (var k = 0; k < 6; k++) { var a = (90 + 60 * k) * Math.PI / 180; if (!inZone(z, x + R * Math.cos(a), y + R * Math.sin(a), 0)) return false; }
@@ -848,22 +1094,53 @@ td { font-size: 13px; }
     return res;
   }
 
-  // Single ring: slots on the largest circle that fits the panel (radius reaches the edge less half a slot length).
-  // N = target open area / slot area, spread evenly round the circle. The gap is the arc left between slot sides.
+  // Rings of radial slots, from the largest circle that fits the panel inward, as many as the Rings box asks.
+  // The narrowest bridge of a radial slot is between the inner ends of neighbouring slots, so every ring is given
+  // the same gap there: its slot count is its inner-end circumference over one shared pitch q. The rings are
+  // spaced by that same gap, and q comes from the target open area. Odd rings turn half a step so slots of
+  // neighbouring rings do not line up. The middle (inside a fifth of the outer radius) is left open.
   function layoutBand(sol, z, store, res) {
-    var L = sol.L, Rr = Math.min(z.ax, z.ay) - L / 2, area = rrArea(2 * z.ax, 2 * z.ay, z.r, z.n), i, a, N;
-    if (!(Rr > 0)) return res;
-    // The circle holds at most this many slots with the minimum gap; a higher target is shown as the reached value.
-    N = Math.max(1, Math.min(Math.round(sol.f * area / sol.A), Math.floor(2 * Math.PI * Rr / (sol.s + 0.01))));
-    if (store) sol.cc = { x: z.cx, y: z.cy };
-    res.area = area; res.N = N; res.minGap = 2 * Math.PI * Rr / N - sol.s;
-    for (i = 0; i < N; i++) {
-      a = Math.PI / 2 + 2 * Math.PI * i / N;
-      var x = z.cx + Rr * Math.cos(a), y = z.cy + Rr * Math.sin(a);
-      if (!holeInside(sol, z, x, y)) continue;
-      res.count++;
-      if (store) res.pts.push(x, y);
+    var L = sol.L, s = sol.s, r = sol.r, ext = Math.min(z.ax, z.ay) - r;
+    // outer ring: its slots' outer corners (arc centres L/2 - r out and s/2 - r aside, plus r) just reach the edge
+    var R0 = Math.sqrt(Math.max(0, ext * ext - (s / 2 - r) * (s / 2 - r))) - L / 2 + r - 1e-6;
+    // Facing inner corners of neighbouring slots: arc centres at radius rho(R), turned phi(R) off the slot axis.
+    // The gap between them is 2 rho sin(pi/N - phi) - 2r; it reads as a pitch of 2 pi rho / N less a width wEff.
+    var rho = function (R) { return Math.hypot(R - L / 2 + r, s / 2 - r); };
+    var phi = function (R) { return Math.atan2(s / 2 - r, R - L / 2 + r); };
+    var wEff = function (R) { return 2 * rho(R) * phi(R) + 2 * r; };
+    var gapAt = function (R, N) { return 2 * rho(R) * Math.sin(Math.PI / N - phi(R)) - 2 * r; };
+    var area = rrArea(2 * z.ax, 2 * z.ay, z.r, z.n), want = Math.max(1, Math.round(num("ringsN") || 1));
+    if (!(R0 > 0)) return res;
+    var rVoid = 0.2 * Math.min(z.ax, z.ay), Ntot = Math.max(1, sol.f * area / sol.A), g = s, q = s, rings = [], it, k;
+    for (it = 0; it < 12; it++) {
+      rings = [];
+      for (k = 0; k < want; k++) {
+        var R = R0 - k * (L + g);
+        if (k > 0 && (R - L / 2 < rVoid || R - L / 2 < s)) break;
+        rings.push(R);
+      }
+      q = rings.reduce(function (t, R) { return t + 2 * Math.PI * rho(R); }, 0) / Ntot;
+      var gn = Math.max(0.01, q - wEff(R0));
+      if (Math.abs(gn - g) < 1e-5) { g = gn; break; }
+      g = gn;
     }
+    if (store) sol.cc = { x: z.cx, y: z.cy };
+    var minGap = rings.length > 1 ? g : Infinity, total = 0;
+    rings.forEach(function (R, k) {
+      var N = Math.max(1, Math.round(2 * Math.PI * rho(R) / q));
+      // never closer than 0.01 mm at the inner ends (the process limits then decide the real minimum)
+      while (N > 1 && gapAt(R, N) < 0.01) N--;
+      if (N > 1) minGap = Math.min(minGap, gapAt(R, N));
+      total += N;
+      var a0 = Math.PI / 2 + (k % 2 ? Math.PI / N : 0);
+      for (var i = 0; i < N; i++) {
+        var a = a0 + 2 * Math.PI * i / N, x = z.cx + R * Math.cos(a), y = z.cy + R * Math.sin(a);
+        if (!holeInside(sol, z, x, y)) continue;
+        res.count++;
+        if (store) res.pts.push(x, y);
+      }
+    });
+    res.area = area; res.N = total; res.minGap = minGap; res.q = q; res.rings = rings.length; res.ringsAsked = want;
     return res;
   }
 
@@ -995,12 +1272,12 @@ td { font-size: 13px; }
   function applyMeasuredGap(sol, lay) {
     if (sol.band) {
       if (!isFinite(lay.minGap) || lay.minGap < 0.01) { sol.ok = false; sol.achieved = NaN; return; }
-      sol.bridge = r2(lay.minGap); sol.pitch = [["g", r2(lay.minGap + sol.s)]];
+      sol.bridge = r2(lay.minGap); sol.pitch = [["g", r2(lay.q)]];
       sol.achieved = sol.A * lay.count / lay.area;
       return;
     }
     if (sol.pattern !== "round-contour" || !isFinite(lay.minGap)) return;
-    sol.bridge = r2(lay.minGap - sol.s);
+    sol.bridge = r2(lay.minGap - (sol.shape === "custom" ? 2 * CUSTOM.rc : 1) * sol.s);
     sol.pitch = [["U1", r2(lay.qx)], ["U2", r2(lay.qy)], ["min", r2(lay.minGap)]];
     sol.achieved = sol.A / (lay.qx * lay.qy);
   }
@@ -1040,16 +1317,19 @@ td { font-size: 13px; }
         d.push("M" + n(x - r) + " " + n(y) + "a" + n(r) + " " + n(r) + " 0 1 0 " + n(s) + " 0a" + n(r) + " " + n(r) + " 0 1 0 " + n(-s) + " 0Z");
       } else if (sol.shape === "square") {
         d.push("M" + n(x - s / 2) + " " + n(y - s / 2) + "h" + n(s) + "v" + n(s) + "h" + n(-s) + "Z");
-      } else if (sol.shape === "rect") {
-        d.push("M" + n(x - L / 2) + " " + n(y - s / 2) + "h" + n(L) + "v" + n(s) + "h" + n(-L) + "Z");
-      } else if (sol.shape === "slot" && sol.radial) {
-        var hr = s / 2, cr = L / 2 - hr, ur = slotUnit(sol.cc, x, pts[i + 1]), uxS = ur.x, uyS = -ur.y;
-        var nxr = -uyS * hr, nyr = uxS * hr;
-        var Ax = x - uxS * cr, Ay = y - uyS * cr, Bx = x + uxS * cr, By = y + uyS * cr;
-        d.push("M" + n(Ax - nxr) + " " + n(Ay - nyr) + "L" + n(Bx - nxr) + " " + n(By - nyr) + "A" + n(hr) + " " + n(hr) + " 0 0 1 " + n(Bx + nxr) + " " + n(By + nyr) + "L" + n(Ax + nxr) + " " + n(Ay + nyr) + "A" + n(hr) + " " + n(hr) + " 0 0 1 " + n(Ax - nxr) + " " + n(Ay - nyr) + "Z");
+      } else if (sol.shape === "custom") {
+        var cv = customPoly(sol, x, pts[i + 1], k, false, sol.cc), cs = "";
+        cv.forEach(function (v, j) { cs += (j ? "L" : "M") + n(v[0]) + " " + n(H - v[1]); });
+        d.push(cs + "Z");
       } else if (sol.shape === "slot") {
-        var h = s / 2, x1 = x - (L / 2 - h), x2 = x + (L / 2 - h);
-        d.push("M" + n(x1) + " " + n(y - h) + "H" + n(x2) + "A" + n(h) + " " + n(h) + " 0 0 1 " + n(x2) + " " + n(y + h) + "H" + n(x1) + "A" + n(h) + " " + n(h) + " 0 0 1 " + n(x1) + " " + n(y - h) + "Z");
+        // the outline is built y-up and drawn at H - y, which keeps the picture: its corners stay counter-clockwise arcs
+        var ua = slotAxis(sol, x, pts[i + 1]), rk = sol.r * k, vs = slotVerts(x, pts[i + 1], ua.x, ua.y, L, s, rk), seg = "";
+        vs.forEach(function (v, j) {
+          var nx2 = vs[(j + 1) % vs.length];
+          if (!j) seg += "M" + n(v[0]) + " " + n(H - v[1]);
+          seg += v[2] ? "A" + n(rk) + " " + n(rk) + " 0 0 0 " + n(nx2[0]) + " " + n(H - nx2[1]) : "L" + n(nx2[0]) + " " + n(H - nx2[1]);
+        });
+        d.push(seg + "Z");
       } else if (sol.shape === "hex") {
         var R = s / SQ3, seg = "";
         for (var kk = 0; kk < 6; kk++) {
@@ -1124,16 +1404,11 @@ td { font-size: 13px; }
         head("CIRCLE", "HOLES", "AcDbCircle"); p(10, num(x)); p(20, num(y)); p(30, 0); p(40, num(s / 2));
       } else if (sol.shape === "square") {
         lwpoly("HOLES", [[x - s / 2, y - s / 2], [x + s / 2, y - s / 2], [x + s / 2, y + s / 2], [x - s / 2, y + s / 2]]);
-      } else if (sol.shape === "rect") {
-        var l = (sol.L * k) / 2;
-        lwpoly("HOLES", [[x - l, y - s / 2], [x + l, y - s / 2], [x + l, y + s / 2], [x - l, y + s / 2]]);
-      } else if (sol.shape === "slot" && sol.radial) {
-        var hq = s / 2, cq = sol.L * k / 2 - hq, uq = slotUnit(sol.cc, x, y), nxq = -uq.y * hq, nyq = uq.x * hq;
-        var Aq = [x - uq.x * cq, y - uq.y * cq], Bq = [x + uq.x * cq, y + uq.y * cq];
-        lwpoly("HOLES", [[Aq[0] - nxq, Aq[1] - nyq, 0], [Bq[0] - nxq, Bq[1] - nyq, 1], [Bq[0] + nxq, Bq[1] + nyq, 0], [Aq[0] + nxq, Aq[1] + nyq, 1]]);
+      } else if (sol.shape === "custom") {
+        lwpoly("HOLES", customPoly(sol, x, y, k, false, sol.cc));
       } else if (sol.shape === "slot") {
-        var hh = s / 2, Lk = sol.L * k, x1 = x - (Lk / 2 - hh), x2 = x + (Lk / 2 - hh);
-        lwpoly("HOLES", [[x1, y - hh, 0], [x2, y - hh, 1], [x2, y + hh, 0], [x1, y + hh, 1]]);
+        var uq = slotAxis(sol, x, y);
+        lwpoly("HOLES", slotVerts(x, y, uq.x, uq.y, sol.L * k, s, sol.r * k));
       } else if (sol.shape === "hex") {
         var R = s / SQ3, v = [];
         for (var kk = 0; kk < 6; kk++) { var a = (90 + 60 * kk) * Math.PI / 180; v.push([x + R * Math.cos(a), y + R * Math.sin(a)]); }
@@ -1216,16 +1491,21 @@ td { font-size: 13px; }
       '<svg viewBox="0 0 40 40" aria-hidden="true">' + icon + '</svg></button>';
   }
 
+  function customIcon() {
+    var P = CUSTOM.draw, sc = 13 / Math.max(CUSTOM.w, CUSTOM.h) * 2;
+    return '<path d="' + P.map(function (p, i) { return (i ? "L" : "M") + (20 + p[0] * sc).toFixed(2) + " " + (20 - p[1] * sc).toFixed(2); }).join("") + 'Z"/>';
+  }
   function renderOptions() {
     var def = curDef();
+    SHAPE_ICON.custom = customIcon();
     $("shapeOpts").innerHTML = Object.keys(SHAPE_DEF).map(function (k) {
+      if (k === "custom" && !CUSTOM.loaded)
+        return '<button type="button" class="opt" data-key="custom" aria-pressed="' + (k === S.shape) + '" title="Custom"><span class="optText">Custom</span></button>';
       return optBtn(k, SHAPE_DEF[k].name, SHAPE_ICON[k], k === S.shape);
     }).join("");
     $("arrayOpts").innerHTML = def.arrays.map(function (a) {
       return optBtn(a, ARR_DEF[a].name, arrIcon(a), a === S.pattern);
     }).join("");
-    $("squareWrap").hidden = S.shape !== "rect";
-    $("squareChk").checked = S.square;
     // Shapes with a single array (hexagon) have nothing to choose, so the array row stays hidden.
     var showArr = S.arrOpen && def.arrays.length > 1;
     $("arraySub").hidden = !showArr;
@@ -1235,28 +1515,66 @@ td { font-size: 13px; }
     $("selection").textContent = def.name + " · " + ARR_DEF[S.pattern].name + (effPattern() === "round-contour" ? " · Contour" : "");
     $("sizeLabel").textContent = def.label;
     $("lengthCtrl").hidden = !def.needsL;
+    $("customCtrl").hidden = !def.custom;
+    $("customLoadRow").hidden = !def.custom;
+    $("customRadialWrap").hidden = !(def.custom && (S.pattern === "round-sun" || S.pattern === "round-ring"));
+    $("customName").textContent = CUSTOM.name;
+    $("cornerCtrl").hidden = !def.corner;
+    $("ringsCtrl").hidden = S.pattern !== "slot-band";
 
   }
 
   function fixPattern() {
     var arr = curDef().arrays;
     if (arr.indexOf(S.pattern) < 0) S.pattern = arr[0];
+    if (!CIRCLE_ARR[S.pattern]) circlePanel(false);
+  }
+  // Round arrays are drawn on a circular panel: clicking one makes the panel a circle whose diameter is the
+  // shorter side. Leaving them for another array brings back the size the panel had before.
+  var CIRCLE_ARR = { "round-sun": true, "round-ring": true, "slot-band": true }, circleSave = null, CIRCLE_EDGE = 2;
+  function circlePanel(on) {
+    if (!on && !circleSave) return;
+    leaveGrad();
+    if (on) {
+      var W = num("pw"), H = num("ph");
+      if (!(W > 0 && H > 0)) return;
+      if (!circleSave) circleSave = { W: W, H: H, Rc: num("prc") || 0, m: num("pm") || 0 };
+      var dia = Math.min(W, H);
+      setVal("pw", dia); setVal("ph", dia); setVal("prc", dia / 2);
+      // holes on a round panel keep at least 2 mm from the rim
+      if (!((num("pm") || 0) >= CIRCLE_EDGE)) setVal("pm", CIRCLE_EDGE);
+    } else {
+      setVal("pw", circleSave.W); setVal("ph", circleSave.H); setVal("prc", circleSave.Rc); setVal("pm", circleSave.m);
+      circleSave = null;
+    }
   }
   function setShape(key) {
     S.shape = key; S.arrOpen = true;
     fixPattern(); renderOptions(); render();
   }
   function setArray(key) {
-    S.pattern = key; morphNext = true;
+    S.pattern = key;
+    circlePanel(!!CIRCLE_ARR[key]);
     renderOptions(); render();
   }
   $("contourChk").addEventListener("change", function () {
     S.contour = $("contourChk").checked;
     renderOptions(); render();
   });
-  $("squareChk").addEventListener("change", function () {
-    S.square = $("squareChk").checked;
-    fixPattern(); renderOptions(); render();
+  // Corner r: its slider ends at half the slot width; at that end it keeps following the width.
+  function syncCornerR() {
+    var half = r2((num("sizeN") || 0) / 2);
+    if (!(half > 0)) return;
+    $("cornerR").max = String(half);
+    if (S.rFull || num("cornerN") > half) { S.rFull = true; $("cornerN").value = String(half); $("cornerR").value = String(half); }
+  }
+  ["cornerR", "cornerN"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      var half = (num("sizeN") || 0) / 2, v = num(id);
+      if (id === "cornerR") $("cornerN").value = $("cornerR").value; else if (isFinite(v)) $("cornerR").value = String(Math.min(half, Math.max(0, v)));
+      S.rFull = isFinite(v) && v >= half - 0.005;
+      schedule();
+    });
   });
 
   $("shapeOpts").addEventListener("click", function (e) {
@@ -1304,8 +1622,8 @@ td { font-size: 13px; }
     var shape = PATTERN_SHAPE[inp.pattern];
     if (!(inp.t > 0)) return "Enter a thickness above 0 mm.";
     if (!(inp.s > 0)) return "Enter a hole size above 0 mm.";
-    if ((shape === "slot" || shape === "rect") && !(inp.L > 0)) return "Enter a hole length above 0 mm.";
-    if (shape === "slot" && inp.L <= inp.s) return "Slot length must be longer than the slot width.";
+    if (shape === "slot" && !(inp.L > 0)) return "Enter a hole length above 0 mm.";
+    if (shape === "slot" && inp.L < inp.s) return "Slot length must be at least the slot width.";
     if (!(inp.f > 0 && inp.f < 1)) return "Enter a target open area between 1 and 95 %.";
     if (!(inp.W > 0 && inp.H > 0)) return "Enter a panel width and height above 0 mm.";
     if (!(inp.Rc >= 0)) return "Enter a corner radius of 0 mm or more.";
@@ -1315,97 +1633,18 @@ td { font-size: 13px; }
     return null;
   }
 
-  // ---------- Shape morph ----------
-  // Every hole shape is sampled as the same 24 points around its centre, so one outline can be blended into another.
-  var MAX_MORPH = 4000, lastRadial = false, lastOutline = null, lastPts = null, lastH = 0, morphNext = false, morphId = 0;
   var reducedMotion = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
-  function outline(sol) {
-    var N = 24, o = [], s = sol.s, h = s / 2;
-    for (var k = 0; k < N; k++) {
-      var th = 2 * Math.PI * k / N, cs = Math.cos(th), sn = Math.sin(th);
-      var ac = Math.max(Math.abs(cs), 1e-9), as = Math.max(Math.abs(sn), 1e-9), r;
-      if (sol.shape === "round") r = h;
-      else if (sol.shape === "square") r = Math.min(h / ac, h / as);
-      else if (sol.shape === "rect") r = Math.min(sol.L / 2 / ac, h / as);
-      else if (sol.shape === "slot") {
-        var c = sol.L / 2 - h, rf = h / as;
-        r = rf * ac <= c ? rf : c * ac + Math.sqrt(Math.max(0, h * h - c * c * sn * sn));
-      } else {
-        var phi = (((th * 180 / Math.PI) % 60) + 60) % 60 - 30;
-        r = h / Math.cos(phi * Math.PI / 180);
-      }
-      o.push(r * cs, r * sn);
-    }
-    return o;
-  }
-  // Holes are matched by their row and column counted from the top-left corner. Matched holes slide from
-  // their old place to their new one while the outline changes. Holes that only exist in the new pattern
-  // slide in from where the old grid would have put them (past the right or bottom edge); holes that only
-  // exist in the old pattern slide out to where the new grid would put them. The panel clips both.
-  function lattice(pts, H) {
-    var rows = [], i, cur = null, lastY = null;
-    for (i = 0; i < pts.length; i += 2) {
-      var y = H - pts[i + 1];
-      if (cur === null || Math.abs(y - lastY) > 1e-6) { cur = { y: y, xs: [] }; rows.push(cur); lastY = y; }
-      cur.xs.push(pts[i]);
-    }
-    rows.sort(function (p, q) { return p.y - q.y; });
-    var dx = 0, dy = 0;
-    for (i = 0; i < rows.length && !dx; i++) if (rows[i].xs.length > 1) dx = rows[i].xs[1] - rows[i].xs[0];
-    if (rows.length > 1) dy = rows[1].y - rows[0].y;
-    if (!dx) dx = dy || 1; if (!dy) dy = dx;
-    return { rows: rows, dx: dx, dy: dy };
-  }
-  function latticePos(L, r, c) {
-    var n = L.rows.length, row, y;
-    if (r < n) { row = L.rows[r]; y = row.y; }
-    else {
-      var back = r - n + 1, ref = r - 2 * Math.ceil(back / 2);
-      row = L.rows[Math.max(0, Math.min(n - 1, ref))];
-      y = L.rows[n - 1].y + back * L.dy;
-    }
-    var xs = row.xs, x = c < xs.length ? xs[c] : xs[xs.length - 1] + (c - xs.length + 1) * L.dx;
-    return [x, y];
-  }
-  function morph(from, to, sol, oldPts, oldH, pts, H, el) {
-    var A = lattice(oldPts, oldH), B = lattice(pts, H), moves = [], r, c;
-    var nr = Math.max(A.rows.length, B.rows.length);
-    for (r = 0; r < nr; r++) {
-      var na = r < A.rows.length ? A.rows[r].xs.length : 0, nb = r < B.rows.length ? B.rows[r].xs.length : 0;
-      for (c = 0; c < Math.max(na, nb); c++) {
-        var p0 = c < na ? [A.rows[r].xs[c], A.rows[r].y] : latticePos(A, r, c);
-        var p1 = c < nb ? [B.rows[r].xs[c], B.rows[r].y] : latticePos(B, r, c);
-        moves.push(p0[0], p0[1], p1[0], p1[1]);
-      }
-    }
-    // Only the array changes here, so every frame draws the real hole shape at the in-between positions.
-    var start = performance.now(), dur = 650, ip = new Array(moves.length / 2);
-    function frame(now) {
-      var t = Math.min(1, (now - start) / dur);
-      if (t >= 1) { el.setAttribute("d", svgPath(sol, pts, H)); return; }
-      var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, n, k = 0;
-      for (n = 0; n < moves.length; n += 4) {
-        ip[k++] = moves[n] + (moves[n + 2] - moves[n]) * e;
-        ip[k++] = H - (moves[n + 1] + (moves[n + 3] - moves[n + 1]) * e);
-      }
-      el.setAttribute("d", svgPath(sol, ip, H));
-      morphId = requestAnimationFrame(frame);
-    }
-    frame(start);
-  }
 
   // Array icons drawn with the hole shape that is selected.
   function glyph(kind, x, y) {
     if (kind === "round") return '<circle cx="' + x + '" cy="' + y + '" r="2.6"/>';
     if (kind === "square") return '<rect x="' + (x - 2.6) + '" y="' + (y - 2.6) + '" width="5.2" height="5.2"/>';
     if (kind === "slot") return '<rect x="' + (x - 6) + '" y="' + (y - 2.5) + '" width="12" height="5" rx="2.5"/>';
-    if (kind === "rect") return '<rect x="' + (x - 5.5) + '" y="' + (y - 3.5) + '" width="11" height="7"/>';
     return '<polygon points="' + hexPts(x, y, 3.2) + '"/>';
   }
   var ICON_POS = {
     tri: [[9, 11], [20, 11], [31, 11], [14.5, 20.5], [25.5, 20.5], [9, 30], [20, 30], [31, 30]],
     sq: [[9, 9], [20, 9], [31, 9], [9, 20], [20, 20], [31, 20], [9, 31], [20, 31], [31, 31]],
-    stag: [[9, 11], [20, 11], [31, 11], [14.5, 20.5], [25.5, 20.5], [9, 30], [20, 30], [31, 30]],
     hex: [[10, 10], [22, 10], [34, 10], [16, 21], [28, 21], [10, 32], [22, 32], [34, 32]],
     sun: (function () {
       var o = [], i, r;
@@ -1414,7 +1653,8 @@ td { font-size: 13px; }
     })(),
     band: (function () {
       var o = [], i, a;
-      for (i = 0; i < 12; i++) { a = Math.PI / 2 + 2 * Math.PI * i / 12; o.push([+(20 + 13 * Math.cos(a)).toFixed(2), +(20 - 13 * Math.sin(a)).toFixed(2)]); }
+      for (i = 0; i < 14; i++) { a = Math.PI / 2 + 2 * Math.PI * i / 14; o.push([+(20 + 15 * Math.cos(a)).toFixed(2), +(20 - 15 * Math.sin(a)).toFixed(2)]); }
+      for (i = 0; i < 8; i++) { a = Math.PI / 2 + Math.PI / 8 + 2 * Math.PI * i / 8; o.push([+(20 + 8.5 * Math.cos(a)).toFixed(2), +(20 - 8.5 * Math.sin(a)).toFixed(2)]); }
       return o;
     })(),
     ring: (function () {
@@ -1426,12 +1666,13 @@ td { font-size: 13px; }
     wsq: [[11, 10], [29, 10], [11, 20], [29, 20], [11, 30], [29, 30]],
     wstag: [[8, 10], [24, 10], [16, 20], [32, 20], [8, 30], [24, 30]]
   };
+  ICON_POS.stag = ICON_POS.tri;
   function arrIcon(pattern) {
     var kind = PATTERN_SHAPE[pattern], icon = ARR_DEF[pattern].icon;
-    var wide = kind === "slot" || kind === "rect";
+    var wide = kind === "slot";
     var pos = ICON_POS[wide ? "w" + icon : icon] || ICON_POS[icon];
     // The round arrays use more, smaller dots so their spiral and rings read at icon size.
-    if (icon === "sun" || icon === "ring" || icon === "band" || icon === "contour") return pos.map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.7"/>'; }).join("");
+    if (icon === "sun" || icon === "ring" || icon === "band") return pos.map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.7"/>'; }).join("");
     return pos.map(function (p) { return glyph(kind, p[0], p[1]); }).join("");
   }
 
@@ -1477,19 +1718,25 @@ td { font-size: 13px; }
   ["input", "change", "click"].forEach(function (t) { document.addEventListener(t, noteEdit, true); });
 
   function limitsOf(inp) {
+    if (!limitsOn()) return null;
     var r = RULES[inp.process] && RULES[inp.process][inp.material];
     if (!r) return null;
     return { h: r.tMul ? r.h * inp.t : r.h, b: r.tMul ? r.b * inp.t : r.b, d: r.d, tMul: r.tMul, rule: r };
   }
   function fits(inp, lim, s, f) {
     if (s < lim.h - 1e-9) return false;
+    if (S.shape === "custom" && s * customThinRatio() < lim.h - 1e-9) return false;
     if (lim.d && inp.t > lim.d * s + 1e-9) return false;
     var shape = PATTERN_SHAPE[inp.pattern];
-    if (shape === "slot" && !(inp.L > s)) return false;
+    if (shape === "slot" && !(inp.L >= s)) return false;
+    var sol = solveMeasured(inp, s, f);
+    return sol.ok && sol.bridge >= lim.b - 1e-9;
+  }
+  // Solve, then for the arrays whose gap depends on the panel (contour, single ring) measure it from a layout.
+  function solveMeasured(inp, s, f) {
     var sol = solve(inp.pattern, s, inp.L, f);
-    if (!sol.ok) return false;
-    if (inp.pattern === "round-contour" || inp.pattern === "slot-band") applyMeasuredGap(sol, layout(sol, zoneOf(inp), false));
-    return sol.bridge >= lim.b - 1e-9;
+    if (sol.ok && (inp.pattern === "round-contour" || inp.pattern === "slot-band")) applyMeasuredGap(sol, layout(sol, zoneOf(inp), false));
+    return sol;
   }
   function smallestSize(inp, lim) {
     var lo = Math.max(lim.h, lim.d ? inp.t / lim.d : 0, 0.01), hi = lo, i;
@@ -1501,17 +1748,18 @@ td { font-size: 13px; }
     for (i = 0; i < 20 && !fits(inp, lim, v, inp.f); i++) v = r2(v + 0.01);
     return fits(inp, lim, v, inp.f) ? v : null;
   }
-  function maxTarget(inp, lim) {
+  // Largest target (0.1 % steps) up to hi that still fits; null when even 1 % does not.
+  function maxTarget(inp, lim, hi) {
     if (!fits(inp, lim, inp.s, 0.01)) return null;
-    if (fits(inp, lim, inp.s, 0.95)) return 0.95;
-    var lo = 0.01, hi = 0.95, i;
+    if (fits(inp, lim, inp.s, hi)) return hi;
+    var lo = 0.01, i;
     for (i = 0; i < 22; i++) { var mid = (lo + hi) / 2; if (fits(inp, lim, inp.s, mid)) lo = mid; else hi = mid; }
     return Math.floor(lo * 1000 + 1e-6) / 1000;
   }
   function updateBounds(inp) {
     var lim = limitsOf(inp);
     bounds.sMin = lim ? smallestSize(inp, lim) : null;
-    bounds.fMax = lim ? maxTarget(inp, lim) : null;
+    bounds.fMax = lim ? maxTarget(inp, lim, 0.95) : null;
     if (lim) showLimitNote(inp, lim);
   }
   // When the hole size or the target sits right at its limit, say in the limit box which rule stops it.
@@ -1539,13 +1787,6 @@ td { font-size: 13px; }
     if (!notes.length) return;
     status.innerHTML = '<span class="chip warn">At limit</span><ul>' + notes.map(function (n) { return "<li>" + n + "</li>"; }).join("") + "</ul>";
   }
-  function largestTarget(inp, lim) {
-    if (!fits(inp, lim, inp.s, 0.01)) return null;
-    var lo = 0.01, hi = inp.f, i;
-    for (i = 0; i < 22; i++) { var mid = (lo + hi) / 2; if (fits(inp, lim, inp.s, mid)) lo = mid; else hi = mid; }
-    var v = Math.floor(lo * 1000 + 1e-6) / 1000;
-    return v >= 0.01 ? v : null;
-  }
   function setPair(rid, nid, v) {
     $(rid).value = String(Math.min(+$(rid).max, Math.max(+$(rid).min, v)));
     if (document.activeElement !== $(nid) || forceWrite) $(nid).value = String(v);
@@ -1554,39 +1795,53 @@ td { font-size: 13px; }
   ["sizeN", "targetN"].forEach(function (id) { $(id).addEventListener("change", function () { forceWrite = true; render(); forceWrite = false; }); });
 
   // Returns the warnings to show when an input was held at a limit (empty when nothing was held).
+  // What fails at hole size s and target f, in a few words each.
+  function failReasons(inp, lim, s, f) {
+    var out = [], sol = solveMeasured(inp, s, f);
+    if (s < lim.h - 1e-9) out.push("the hole is below the " + f2(lim.h) + " mm minimum");
+    if (lim.d && inp.t > lim.d * s + 1e-9) out.push("the " + f2(inp.t) + " mm sheet is more than " + lim.d + " × the hole size");
+    if (S.shape === "custom" && s * customThinRatio() < lim.h - 1e-9) out.push("about " + Math.round(customThin(s, lim.h) * 100) + " % of the shape is narrower than " + f2(lim.h) + " mm");
+    if (!sol.ok) out.push("the holes would touch");
+    else if (sol.bridge < lim.b - 1e-9) out.push("the bridge would be " + f2(sol.bridge) + " mm (minimum " + f2(lim.b) + " mm)");
+    return out.length ? out : ["it is outside the limits"];
+  }
   function enforceLimits(inp) {
     var lim = limitsOf(inp);
     if (!lim || fits(inp, lim, inp.s, inp.f)) return [];
-    var asked = solve(inp.pattern, inp.s, inp.L, inp.f);
-    if ((inp.pattern === "round-contour" || inp.pattern === "slot-band") && asked.ok) applyMeasuredGap(asked, layout(asked, zoneOf(inp), false));
-    var why = asked.ok ? checkRules(inp.material, inp.process, inp.t, asked) : [];
-    if (lastEdit === "target") {
-      var fMax = largestTarget(inp, lim);
+    // Rings of slots: a larger slot fits fewer slots per ring, so only a lower target can help there.
+    if (lastEdit === "target" || inp.pattern === "slot-band") {
+      var fMax = maxTarget(inp, lim, inp.f);
+      if (fMax !== null && inp.pattern === "slot-band" && lastEdit !== "target") {
+        // The target box keeps what was asked, so adding rings later can still reach it.
+        inp.fAsk = inp.f; inp.f = fMax;
+        return [(num("ringsN") || 1) + " ring" + ((num("ringsN") || 1) > 1 ? "s" : "") + " reach at most " + (fMax * 100).toFixed(1) +
+          " % (target " + (inp.fAsk * 100).toFixed(1) + " %). Add rings or use longer slots to reach it."];
+      }
       if (fMax !== null) {
-        var fAsk = inp.f;
+        var fAsk = inp.f, wf = failReasons(inp, lim, inp.s, fAsk);
         inp.f = fMax; setPair("targetR", "targetN", r2(fMax * 1000) / 10);
-        return why.concat(["Target held at " + (fMax * 100).toFixed(1) + " % (asked " + (fAsk * 100).toFixed(1) + " %), the most this hole size allows."]);
+        return ["At " + (fAsk * 100).toFixed(1) + " % " + wf.join(" and ") + ", so the target was lowered to " + (fMax * 100).toFixed(1) + " %, the most this hole size allows."];
       }
     }
     var sMin = smallestSize(inp, lim);
     if (sMin === null) return null;
-    var sAsk = inp.s;
+    var sAsk = inp.s, ws = failReasons(inp, lim, sAsk, inp.f);
     inp.s = sMin; setPair("sizeR", "sizeN", sMin);
-    return why.concat(["Hole size held at " + f2(sMin) + " mm (asked " + f2(sAsk) + " mm), the smallest that meets the limits."]);
+    return ["At " + f2(sAsk) + " mm " + ws.join(" and ") + ", so the hole size was raised to " + f2(sMin) + " mm, the smallest that meets the limits."];
   }
 
-  // ---------- Gradient: holes shrink inward from the outline of an ellipse or rectangle ----------
-  // The area is stored as a centre (internal coords, y-up, like pts), half sizes and a rotation in degrees
-  // (clockwise on screen). On the outline the holes keep their full size; going inward they shrink to the
-  // minimum over the Fade distance, and the grey shading deepens the same way. Outside nothing changes.
-  // The area may leave the panel. G.sel: the area is the selected object, so the Panel size fields show it.
+  // ---------- Gradient: holes fade outward from an ellipse, a rectangle or an inset of the panel ----------
+  // The area is stored as a centre measured from the panel's top-left corner (screen frame, y down), half sizes,
+  // a corner radius and type, and a rotation in degrees (clockwise on screen). Inside it the holes keep their full
+  // size; outside they shrink over the Fade distance to the smallest size allowed. The area may leave the panel.
+  // G.sel: the area is the selected object, so the Panel size fields show its size.
   var G = { on: false, shape: "circle", area: null, falloff: 15, sel: false, panelSave: null, draw: null, drag: null, pend: null, H: 50, fading: false, panelMode: false, offset: 5, hidden: false };
   var GRAD_ICON = {
     circle: '<circle cx="20" cy="20" r="13"/>',
     rect: '<rect x="6" y="11" width="28" height="18" rx="2"/>',
     panel: '<path fill-rule="evenodd" d="M5 8H35V32H5Z M11 13V27H29V13Z"/>'
   };
-  var SNAP_MM = 2, SHADE_N = 10, fadeHold = false;
+  var SNAP_MM = 2, SNAP_HOLD = 500, SHADE_N = 10, fadeHold = false;
   function gDeg(r) { return r * Math.PI / 180; }
   function normRot(a) { return ((a + 180) % 360 + 360) % 360 - 180; }
   // Stored area -> screen frame (y-down) for panel height H.
@@ -1682,12 +1937,17 @@ td { font-size: 13px; }
   // Move: the centre follows the pointer; within SNAP_MM of a panel centre line it locks onto that line until the
   // pointer is released (the other axis keeps following). A press that starts inside the snap zone is not
   // locked until the centre has been pulled clear once, so it can always be moved away from the line.
+  // Centre snap: within SNAP_MM of a centre line the area sticks to it for SNAP_HOLD ms, then follows the pointer
+  // again. It sticks again only after the pointer has left that zone and come back (armed: ax / ay), so it neither
+  // traps the area nor keeps grabbing it while it is moved near the centre.
   function gradMove(g, p, W, H) {
-    var dx = p.x - g.p0.x, dy = p.y - g.p0.y, cx = g.c0.x + dx, cy = g.c0.y + dy;
+    var dx = p.x - g.p0.x, dy = p.y - g.p0.y, cx = g.c0.x + dx, cy = g.c0.y + dy, now = performance.now();
     if (Math.abs(cx - W / 2) >= SNAP_MM) g.ax = true;
     if (Math.abs(cy - H / 2) >= SNAP_MM) g.ay = true;
-    if (g.lx === undefined && g.ax && Math.abs(cx - W / 2) < SNAP_MM) g.lx = W / 2 - g.c0.x;
-    if (g.ly === undefined && g.ay && Math.abs(cy - H / 2) < SNAP_MM) g.ly = H / 2 - g.c0.y;
+    if (g.lx !== undefined && now - g.tx > SNAP_HOLD) { g.lx = undefined; g.ax = false; }
+    if (g.ly !== undefined && now - g.ty > SNAP_HOLD) { g.ly = undefined; g.ay = false; }
+    if (g.lx === undefined && g.ax && Math.abs(cx - W / 2) < SNAP_MM) { g.lx = W / 2 - g.c0.x; g.tx = now; }
+    if (g.ly === undefined && g.ay && Math.abs(cy - H / 2) < SNAP_MM) { g.ly = H / 2 - g.c0.y; g.ty = now; }
     return { cx: g.c0.x + (g.lx !== undefined ? g.lx : dx), cy: g.c0.y + (g.ly !== undefined ? g.ly : dy) };
   }
   // Resize from handle h to pointer p, measured along the area's own axes. Alt grows from the centre,
@@ -1806,6 +2066,11 @@ td { font-size: 13px; }
     $("gradFalloffWrap").hidden = !G.on;
     $("gradOffsetWrap").hidden = !(G.on && G.panelMode);
   }
+  document.querySelectorAll(".sumchk").forEach(function (c) { c.addEventListener("click", function (e) { e.stopPropagation(); }); });
+  $("consOn").addEventListener("change", function () {
+    $("constraints").querySelector(".group-body").classList.toggle("off", !$("consOn").checked);
+    bounds.sMin = bounds.fMax = null; render();
+  });
   $("gradOn").addEventListener("change", function () {
     G.on = $("gradOn").checked;
     if (!G.on) { G.draw = null; leaveGrad(); $("canvas").classList.remove("drawing"); }
@@ -1822,8 +2087,9 @@ td { font-size: 13px; }
   });
   $("gradRot").addEventListener("input", gradFromAngle);
   bindPair("gradOffsetR", "gradOffsetN");
-  $("gradOffsetN").addEventListener("input", function () { G.offset = Math.max(0, num("gradOffsetN") || 0); schedule(); });
-  $("gradOffsetR").addEventListener("input", function () { G.offset = Math.max(0, num("gradOffsetN") || 0); schedule(); });
+  ["gradOffsetR", "gradOffsetN"].forEach(function (id) {
+    $(id).addEventListener("input", function () { G.offset = Math.max(0, num("gradOffsetN") || 0); schedule(); });
+  });
   // Collapsing the Gradient section hides its shape (the gradient itself keeps applying to the holes).
   G.hidden = !$("gradient").open;
   $("gradient").addEventListener("toggle", function () {
@@ -1848,7 +2114,6 @@ td { font-size: 13px; }
     if (e.pointerType === "mouse" && document.activeElement && $("gradFalloffWrap").contains(document.activeElement)) document.activeElement.blur();
     setFading(false);
   });
-  G.falloff = 15;
   // Live preview of a drag-to-draw area (screen coordinates).
   function renderGradPreview() {
     var svg = $("canvas").querySelector("svg"); if (!svg) return;
@@ -1874,15 +2139,48 @@ td { font-size: 13px; }
   // ---------- Artboard: select the panel or the gradient area, drag handles ----------
   var art = { selected: false, drag: null }, VIEW_REF_W = 100, VIEW_REF_H = 50;
   var coarse = window.matchMedia ? window.matchMedia("(pointer: coarse)") : { matches: false };
+  // Panel changes ease in instead of jumping. A changed width, height or corner radius (typed, or set by a round
+  // array) is drawn through in-between values; shown is what the last frame drew. Handle drags follow the pointer
+  // directly, and when one is released the view glides from where the drag left it to the centred one.
+  var PANEL_MS = 280, shown = null, panelAnim = null, viewAnim = null;
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  // The gradient area is placed from the panel's top-left corner; the panel itself is drawn centred, so when the
+  // panel size changes the area moves by half the change to stay where it was relative to the middle.
+  var areaPanel = null;
+  function keepAreaCentred(inp) {
+    if (!(inp.W > 0 && inp.H > 0)) return;
+    if (areaPanel && G.area && !G.panelMode && (areaPanel.W !== inp.W || areaPanel.H !== inp.H)) {
+      G.area.cx += (inp.W - areaPanel.W) / 2; G.area.cyS += (inp.H - areaPanel.H) / 2;
+    }
+    areaPanel = { W: inp.W, H: inp.H };
+  }
+  function tweenPanel(inp) {
+    var to = [inp.W, inp.H, inp.Rc], same = function (a, b) { return a[0] === b[0] && a[1] === b[1] && a[2] === b[2]; };
+    if (!shown || art.drag || reducedMotion.matches || !to.every(isFinite)) { panelAnim = null; return; }
+    if (!same(to, panelAnim ? panelAnim.to : shown)) panelAnim = { from: shown, to: to, start: performance.now() };
+    if (!panelAnim) return;
+    var t = (performance.now() - panelAnim.start) / PANEL_MS, a = panelAnim.from;
+    if (t >= 1) { panelAnim = null; return; }
+    var e = easeOut(t);
+    inp.W = a[0] + (to[0] - a[0]) * e; inp.H = a[1] + (to[1] - a[1]) * e; inp.Rc = a[2] + (to[2] - a[2]) * e;
+    schedule();
+  }
+  // Drawing scale: the default 100 mm stage is 900 px wide, so a panel is drawn at the same mm-to-px scale on any
+  // screen. A larger panel is drawn larger; only when it would pass the output width or 60 % of the window height
+  // does the drawing shrink to fit (CSS max-width / max-height on the svg).
+  var PX_PER_MM = 900 / (VIEW_REF_W * 1.04);
   function previewSVG(inp, z, holesD) {
-    // The view keeps the scale of the default 100 mm wide panel: a smaller panel is drawn smaller (from the top
-    // left), and only a panel wider than that zooms the view out, just enough to fit.
+    // A smaller panel sits centred in a stage of at least the reference size; a larger one widens the stage.
     var pad = Math.max(inp.W, inp.H, VIEW_REF_W) * 0.02, d = art.drag;
-    // A fixed stage (at least the reference size) that the panel is centred in, so a smaller panel is not pinned top left.
     var SW = Math.max(inp.W, VIEW_REF_W) + 2 * pad, SH = Math.max(inp.H, VIEW_REF_H) + 2 * pad;
     var vb = d ? d.view : [inp.W / 2 - SW / 2, inp.H / 2 - SH / 2, SW, SH];
+    if (!d && viewAnim) {
+      var vt = (performance.now() - viewAnim.start) / PANEL_MS;
+      if (vt >= 1 || reducedMotion.matches) viewAnim = null;
+      else { var ve = easeOut(vt); vb = vb.map(function (v, i) { return viewAnim.from[i] + (v - viewAnim.from[i]) * ve; }); schedule(); }
+    }
     var ox = d ? d.ox : 0, oy = d ? d.oy : 0, pd = panelPathD(z);
-    var out = '<svg viewBox="' + vb.join(" ") + '" preserveAspectRatio="xMinYMin meet" class="' + (art.selected || G.sel ? "selected" : "") + '" role="img" aria-label="Preview of the perforated panel">' +
+    var out = '<svg viewBox="' + vb.join(" ") + '" preserveAspectRatio="xMidYMid meet" style="width:' + Math.round(vb[2] * PX_PER_MM) + 'px" class="' + (art.selected || G.sel ? "selected" : "") + '" role="img" aria-label="Preview of the perforated panel">' +
       '<g transform="translate(' + ox + " " + oy + ')">' +
       '<path id="panelShape" d="' + pd + '" style="fill:var(--panel);stroke:var(--ink);stroke-width:1.25;vector-effect:non-scaling-stroke"/><clipPath id="panelClip"><path d="' + pd + '"/></clipPath>' +
       '<path id="holesPath" clip-path="url(#panelClip)" d="' + holesD + '" style="fill:var(--hole)"/>';
@@ -2020,8 +2318,10 @@ td { font-size: 13px; }
       // pointer in panel coordinates (the panel is drawn shifted by ox, oy while dragging)
       var dx = p.x - d.p0.x, dy = p.y - d.p0.y, h = d.h;
       if (h.charAt(0) === "r") {
+        // R is measured from the corner nearest the pointer. At the largest R the handles of neighbouring corners
+        // sit on top of each other, so the grabbed handle's own corner could be the wrong one to pull towards.
         var px = p.x - d.ox, py = p.y - d.oy, PW = d.W0, PH = d.H0;
-        var rcx = h.indexOf("l") > 0 ? 0 : PW, rcy = h.charAt(1) === "t" ? 0 : PH, sx = rcx ? -1 : 1, sy = rcy ? -1 : 1;
+        var rcx = px < PW / 2 ? 0 : PW, rcy = py < PH / 2 ? 0 : PH, sx = rcx ? -1 : 1, sy = rcy ? -1 : 1;
         var R = ((px - rcx) * sx + (py - rcy) * sy) / 2;
         R = Math.max(0, Math.min(snap(R, 0.5), Math.floor(Math.min(PW, PH) / 2 * 2) / 2));
         setVal("prc", R);
@@ -2032,7 +2332,8 @@ td { font-size: 13px; }
         setVal("pm", mm);
       } else {
         var east = h.indexOf("e") >= 0, west = h.indexOf("w") >= 0, south = h.indexOf("s") >= 0, north = h.indexOf("n") >= 0;
-        var f = e.altKey ? 2 : 1, W2 = d.W0, H2 = d.H0;
+        // both sides move: the panel is always drawn centred, so the size grows or shrinks around its middle
+        var f = 2, W2 = d.W0, H2 = d.H0;
         if (east) W2 = d.W0 + dx * f; if (west) W2 = d.W0 - dx * f;
         if (south) H2 = d.H0 + dy * f; if (north) H2 = d.H0 - dy * f;
         // The panel never gets smaller than its corners: each side stops at 2 × R (and leaves room for the margin).
@@ -2045,8 +2346,7 @@ td { font-size: 13px; }
         if (d.sq !== undefined) W2 = H2 = d.sq;
         else if (W2 === H2 && !d.wasSq) d.sq = W2;
         d.wasSq = W2 === H2;
-        d.ox = e.altKey ? (d.W0 - W2) / 2 : (west ? d.W0 - W2 : 0);
-        d.oy = e.altKey ? (d.H0 - H2) / 2 : (north ? d.H0 - H2 : 0);
+        d.ox = (d.W0 - W2) / 2; d.oy = (d.H0 - H2) / 2;
         setVal("pw", W2); setVal("ph", H2);
         if ((num("prc") || 0) > Math.min(W2, H2) / 2) setVal("prc", Math.floor(Math.min(W2, H2) / 2 * 2) / 2);
       }
@@ -2063,7 +2363,9 @@ td { font-size: 13px; }
         return;
       }
       if (G.pend) { G.pend = null; leaveGrad(); art.selected = true; render(); return; }
-      if (!art.drag) return; art.drag = null; render();
+      var d = art.drag; if (!d) return;
+      viewAnim = { from: [d.view[0] - d.ox, d.view[1] - d.oy, d.view[2], d.view[3]], start: performance.now() };
+      art.drag = null; render();
     }
     canvas.addEventListener("pointerup", end);
     canvas.addEventListener("pointercancel", function () {
@@ -2085,34 +2387,35 @@ td { font-size: 13px; }
     });
   })();
 
+  function pitchText(sol) {
+    return sol.pitch.length === 1 ? f2(sol.pitch[0][1]) : f2(sol.pitch[0][1]) + " / " + f2(sol.pitch[1][1]);
+  }
   function render() {
-    var tr = $("targetR");
     drawTargetFill();
+    syncCornerR();
     var inp = readInputs();
+    keepAreaCentred(inp);
+    tweenPanel(inp);
     syncPanelArea(inp);
     syncCorner();
     syncGradControls();
-    var shape = PATTERN_SHAPE[inp.pattern];
     var err = validate(inp);
     var stats = $("stats"), status = $("status"), canvas = $("canvas");
     current = null;
-
-    if (err) {
+    // Nothing can be drawn: show why and clear the preview.
+    function fail(chip, msg) {
       stats.innerHTML = "";
-      status.innerHTML = '<span class="chip bad">Check inputs</span><ul><li>' + err + '</li></ul>';
+      status.innerHTML = '<span class="chip bad">' + chip + '</span><ul><li>' + msg + '</li></ul>';
       canvas.innerHTML = ""; $("previewTitle").textContent = "";
+      shown = null;
       setExportEnabled(false); renderCompare(inp);
-      return;
     }
+    if (err) return fail("Check inputs", err);
 
     var held = enforceLimits(inp);
     if (held === null) {
-      stats.innerHTML = "";
-      status.innerHTML = '<span class="chip bad">Not possible</span><ul><li>No hole size meets the ' + PROCESS_NAMES[inp.process].toLowerCase() +
-        ' limits for ' + MATERIALS[inp.material].name + ' at this target. Lower the target open area or change the process.</li></ul>';
-      canvas.innerHTML = ""; $("previewTitle").textContent = "";
-      setExportEnabled(false); renderCompare(inp);
-      return;
+      return fail("Not possible", "No hole size meets the " + PROCESS_NAMES[inp.process].toLowerCase() + " limits for " + MATERIALS[inp.material].name +
+        " at this target. Lower the target open area or change the process.");
     }
     // Bounds take a few dozen solves, so they are worked out just after the drag pauses. While one slider is
     // dragged the other value does not change, so the bound in use stays right.
@@ -2120,17 +2423,21 @@ td { font-size: 13px; }
     boundsTimer = setTimeout(function () { updateBounds(inp); }, 60);
     var sol = solve(inp.pattern, inp.s, inp.L, inp.f);
     if (!sol.ok) {
-      stats.innerHTML = "";
-      status.innerHTML = '<span class="chip bad">Not possible</span><ul><li>' + (inp.f * 100).toFixed(1) +
-        ' % is above what this hole shape can reach (' + (sol.max * 100).toFixed(1) + ' % with zero bridge). Lower the target or change the shape.</li></ul>';
-      canvas.innerHTML = ""; $("previewTitle").textContent = "";
-      setExportEnabled(false); renderCompare(inp);
-      return;
+      return fail("Not possible", (inp.f * 100).toFixed(1) + " % is above what this hole shape can reach (" + (sol.max * 100).toFixed(1) +
+        " % with zero bridge). Lower the target or change the shape.");
     }
 
     var z = zoneOf(inp);
     var lay = layout(sol, z, true);
     applyMeasuredGap(sol, lay);
+    if (sol.shape === "custom" && sol.radial && !lay.tooMany) {
+      var mg = measureCustomGap(sol, lay.pts, sol.cc || { x: z.cx, y: z.cy });
+      if (isFinite(mg)) sol.bridge = r2(mg);
+    }
+    if (S.shape === "custom") {
+      $("customInfo").textContent = f2(CUSTOM.w * inp.s) + " × " + f2(CUSTOM.h * inp.s) + " mm at this size, area " + f2(sol.A) + " mm² (same as a " + f2(inp.s) + " mm circle)." +
+        (CUSTOM.notes.length ? " " + CUSTOM.notes.join(" ") : "");
+    }
     // Gradient: each hole's own size fades outward from the drawn area, clamped to the manufacturing minimum
     // (bounds.sMin, the same floor the hole-size slider stops at). Pitch/bridge stay solved from the full size,
     // so the achieved open area below is the honest, lower, measured value when holes have shrunk.
@@ -2148,39 +2455,32 @@ td { font-size: 13px; }
     var zoneOA = totalArea / rrArea(2 * z.ax, 2 * z.ay, z.r, z.n);
     var hasZone = inp.m > 0;
     var pitchHtml = sol.pitch.map(function (p) { return p[0] + " " + f2(p[1]); }).join(" · ");
-    var pitchMain = sol.pitch.length === 1 ? f2(sol.pitch[0][1]) : f2(sol.pitch[0][1]) + " / " + f2(sol.pitch[1][1]);
     stats.innerHTML =
-      stat("Pitch (mm)", pitchMain, pitchHtml) +
+      stat("Pitch (mm)", pitchText(sol), pitchHtml) +
       stat("Bridge (mm)", f2(sol.bridge)) +
-      stat("Open area (%)", (sol.achieved * 100).toFixed(2), "target " + (inp.f * 100).toFixed(1)) +
+      stat("Open area (%)", (sol.achieved * 100).toFixed(2), "target " + ((inp.fAsk || inp.f) * 100).toFixed(1)) +
       stat("Holes in panel", lay.tooMany ? "—" : lay.count.toLocaleString("en-US")) +
       stat("Panel open area (%)", lay.tooMany ? "—" : (panelOA * 100).toFixed(2),
         hasZone && !lay.tooMany ? "perforated area " + (zoneOA * 100).toFixed(2) : "incl. edge margins");
 
-    var warns = held.length ? held : checkRules(inp.material, inp.process, inp.t, sol);
+    var warns = held.concat(checkRules(inp.material, inp.process, inp.t, sol));
     if (lay.tooMany) warns.push("Over " + MAX_HOLES.toLocaleString("en-US") + " holes: increase the hole size or reduce the panel to preview and export.");
     else if (lay.count === 0) warns.push("No hole fits inside the perforated area. Make the panel larger or the edge margin smaller.");
+    if (lay.ringsAsked > lay.rings) warns.push(lay.rings + " of " + lay.ringsAsked + " rings fit: the middle is kept open. Use shorter slots or a larger panel for more rings.");
     status.innerHTML = warns.length
       ? '<span class="chip warn">Check ' + warns.length + '</span><ul>' + warns.map(function (w) { return "<li>" + w + "</li>"; }).join("") + "</ul>"
-      : '<span class="chip ok">Within ' + PROCESS_NAMES[inp.process].toLowerCase() + ' limits</span>';
+      : limitsOn() ? '<span class="chip ok">Within ' + PROCESS_NAMES[inp.process].toLowerCase() + ' limits</span>'
+      : '<span class="chip">Constraints off · no manufacturing limits</span>';
 
     $("previewTitle").textContent = inp.t + " mm " + MATERIALS[inp.material].name + " · " + PROCESS_NAMES[inp.process];
     if (lay.tooMany || lay.count > MAX_PREVIEW) {
       canvas.innerHTML = '<p class="msg">' + (lay.tooMany ? "Too many holes to draw here." : lay.count.toLocaleString("en-US") + " holes are too many to draw here. Export still works.") + "</p>";
     } else {
-      canvas.innerHTML = previewSVG(inp, z, sol.ok ? svgPath(sol, lay.pts, inp.H, ratios) : "");
+      canvas.innerHTML = previewSVG(inp, z, svgPath(sol, lay.pts, inp.H, ratios));
     }
 
-    // The holes path, not the panel outline drawn before it.
-    var pathEl = canvas.querySelector("#holesPath");
-    var to = outline(sol);
-    cancelAnimationFrame(morphId);
-    if (sol.radial || lastRadial) morphNext = false; // round arrays switch without animation
-    if (morphNext && lastOutline && lastPts && pathEl && lay.count <= MAX_MORPH && lastPts.length / 2 <= MAX_MORPH && !reducedMotion.matches) {
-      morph(lastOutline, to, sol, lastPts, lastH, lay.pts, inp.H, pathEl);
-    }
-    morphNext = false; lastOutline = to; lastPts = lay.pts; lastH = inp.H; lastRadial = !!sol.radial;
 
+    shown = [inp.W, inp.H, inp.Rc];
     current = { inp: inp, sol: sol, pts: lay.pts, ratios: ratios };
     setExportEnabled(!lay.tooMany && lay.count > 0);
     renderCompare(inp);
@@ -2196,7 +2496,7 @@ td { font-size: 13px; }
       return;
     }
     body.innerHTML = sizes.map(function (s) {
-      if (shape === "slot" && !(inp.L > s)) return '<tr data-s="' + s + '"><td>' + f2(s) + '</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="dot bad"></span>Slot longer than width needed</td></tr>';
+      if (shape === "slot" && !(inp.L >= s)) return '<tr data-s="' + s + '"><td>' + f2(s) + '</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="dot bad"></span>Slot longer than width needed</td></tr>';
       var sol = solve(inp.pattern, s, inp.L, inp.f);
       var cls = r2(s) === r2(inp.s) ? ' class="current"' : "";
       if (!sol.ok) return '<tr data-s="' + s + '"' + cls + '><td>' + f2(s) + '</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="dot bad"></span>Target not reachable</td></tr>';
@@ -2204,8 +2504,7 @@ td { font-size: 13px; }
       applyMeasuredGap(sol, lay);
       var w = checkRules(inp.material, inp.process, inp.t, sol);
       var st = w.length ? '<span class="dot warn"></span>' + w.length + (w.length > 1 ? " warnings" : " warning") : '<span class="dot ok"></span>OK';
-      var pitch = sol.pitch.length === 1 ? f2(sol.pitch[0][1]) : f2(sol.pitch[0][1]) + " / " + f2(sol.pitch[1][1]);
-      return '<tr data-s="' + s + '"' + cls + ' tabindex="0"><td>' + f2(s) + '</td><td>' + pitch + '</td><td>' + f2(sol.bridge) + '</td><td>' +
+      return '<tr data-s="' + s + '"' + cls + ' tabindex="0"><td>' + f2(s) + '</td><td>' + pitchText(sol) + '</td><td>' + f2(sol.bridge) + '</td><td>' +
         (sol.achieved * 100).toFixed(2) + '</td><td>' + (lay.tooMany ? "—" : lay.count.toLocaleString("en-US")) + '</td><td>' + st + '</td></tr>';
     }).join("");
   }
@@ -2282,17 +2581,29 @@ td { font-size: 13px; }
   $("process").addEventListener("change", render);
   bindPair("sizeR", "sizeN");
   bindPair("lengthR", "lengthN");
+  bindPair("ringsR", "ringsN");
+  bindPair("customRotR", "customRot");
+  $("customRadial").addEventListener("change", schedule);
+  $("customLoad").addEventListener("click", function () { $("customFile").click(); });
+  $("customFile").addEventListener("change", function () {
+    var f = $("customFile").files && $("customFile").files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try { CUSTOM = parseCustomSVG(String(rd.result), f.name.replace(/\.svg$/i, "")); renderOptions(); render(); }
+      catch (e) { $("customInfo").textContent = e.message + " Try a file with a filled, closed outline."; }
+      $("customFile").value = "";
+    };
+    rd.readAsText(f);
+  });
   bindPair("targetR", "targetN");
   ["thickness", "prc", "pm", "compareSizes"].forEach(function (id) {
     $(id).addEventListener("input", schedule);
   });
+  document.querySelectorAll('input[name="corner"]').forEach(function (el) { el.addEventListener("change", schedule); });
   // Typed W/H edit the gradient area while it is selected, otherwise the panel.
+  // A typed panel width or height below 2 × R is raised to 2 × R once the entry is done, so R is kept.
   ["pw", "ph"].forEach(function (id) {
     $(id).addEventListener("input", function () { if (G.sel) gradFromFields(); else schedule(); });
-  });
-  document.querySelectorAll('input[name="corner"]').forEach(function (el) { el.addEventListener("change", schedule); });
-  // A typed width or height below 2 × R is raised to 2 × R once the entry is done, so R is kept.
-  ["pw", "ph"].forEach(function (id) {
     $(id).addEventListener("change", function () {
       if (G.sel) return;
       var R = num("prc") || 0, v = num(id);
