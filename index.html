@@ -627,35 +627,45 @@ td { font-size: 13px; }
   })();
   function sunMinGap(c) { return r2(SUN_GAP * c); }
 
+  // Pitches are laid out on a 0.1 mm grid. The target open area is a minimum, so the pitch is rounded down
+  // (more open area, never less). Only if that would close the bridge (pitch within 0.01 mm of the hole) is it rounded up.
+  function gridPitch(exact, hole) {
+    if (!isFinite(exact)) return exact;
+    var dn = Math.floor(exact * 10 + 1e-6) / 10;
+    if (dn - hole >= 0.01) return +dn.toFixed(1);
+    return +(Math.ceil(exact * 10 - 1e-6) / 10).toFixed(1);
+  }
   function solve(pattern, s, L, f) {
     var shape = PATTERN_SHAPE[pattern];
     var A = holeArea(shape, s, L);
     var o = { pattern: pattern, shape: shape, s: s, L: L, A: A };
     if (pattern === "round-tri") {
-      var T = r2(Math.sqrt(A / (f * SQ3 / 2)));
+      var T = gridPitch(Math.sqrt(A / (f * SQ3 / 2)), s);
       o.cell = SQ3 / 2 * T * T; o.bridge = T - s; o.dx = T; o.dy = T * SQ3 / 2; o.off = T / 2;
       o.hx = s / 2; o.hy = s / 2; o.max = A / (SQ3 / 2 * s * s); o.pitch = [["T", T]];
     } else if (pattern === "round-sq" || pattern === "sq-sq") {
-      var U = r2(Math.sqrt(A / f));
+      var U = gridPitch(Math.sqrt(A / f), s);
       o.cell = U * U; o.bridge = U - s; o.dx = U; o.dy = U; o.off = 0;
       o.hx = s / 2; o.hy = s / 2; o.max = A / (s * s); o.pitch = [["U1 = U2", U]];
     } else if (pattern === "sq-stag") {
-      var Z1 = r2(Math.sqrt(A / f));
+      var Z1 = gridPitch(Math.sqrt(A / f), s);
       o.cell = Z1 * Z1; o.bridge = Z1 - s; o.dx = Z1; o.dy = Z1; o.off = Z1 / 2;
       o.hx = s / 2; o.hy = s / 2; o.max = 1; o.pitch = [["Z1", Z1], ["Z2", 2 * Z1]];
     } else if (pattern === "slot-stag" || pattern === "rect-stag" || pattern === "slot-sq" || pattern === "rect-sq") {
       // Equal end and side bridge b: cell = (s + b)(L + b). Square arrays line the rows up; staggered arrays shift every other row by half a pitch.
       var K = A / f, q2 = s + L, q = s * L - K;
       var disc = q2 * q2 - 4 * q;
-      var b = disc >= 0 ? r2((-q2 + Math.sqrt(disc)) / 2) : -1;
+      var b = disc >= 0 ? (-q2 + Math.sqrt(disc)) / 2 : -1;
       var stag = pattern.slice(-4) === "stag";
-      o.cell = (s + b) * (L + b); o.bridge = b; o.dx = L + b; o.dy = s + b; o.off = stag ? (L + b) / 2 : 0;
+      // Both pitches go on the 0.1 mm grid on their own, so the end and side bridges can differ slightly; the smaller is shown.
+      var PX = b >= 0 ? gridPitch(L + b, L) : -1, PY = b >= 0 ? gridPitch(s + b, s) : -1;
+      o.cell = PX * PY; o.bridge = b >= 0 ? Math.min(PX - L, PY - s) : -1; o.dx = PX; o.dy = PY; o.off = stag ? PX / 2 : 0;
       o.hx = L / 2; o.hy = s / 2; o.max = A / (s * L);
-      o.pitch = stag ? [["Z1", 2 * (s + b)], ["Z2", L + b]] : [["U1", L + b], ["U2", s + b]];
+      o.pitch = stag ? [["Z1", +(2 * PY).toFixed(1)], ["Z2", PX]] : [["U1", PX], ["U2", PY]];
     } else if (pattern === "round-sun") {
       // Sunflower (Vogel spiral): hole i at radius c*sqrt(i + 0.5), angle i * golden angle.
       // Every hole owns the same area pi*c^2, so open area = A / (pi c^2).
-      var c = r2(Math.sqrt(A / (Math.PI * f)));
+      var c = gridPitch(Math.sqrt(A / (Math.PI * f)), s / SUN_GAP);
       var dmin = sunMinGap(c);
       o.radial = true; o.c = c; o.cell = Math.PI * c * c; o.bridge = dmin - s;
       o.hx = s / 2; o.hy = s / 2; o.max = A / (Math.PI * Math.pow(s / SUN_GAP, 2));
@@ -663,14 +673,14 @@ td { font-size: 13px; }
     } else if (pattern === "round-ring") {
       // Concentric rings: ring k at radius k*p holds 6k holes (one hole in the centre).
       // Each hole owns (pi/3) p^2, so open area = A / ((pi/3) p^2); the closest holes are p apart.
-      var Pr = r2(Math.sqrt(3 * A / (Math.PI * f)));
+      var Pr = gridPitch(Math.sqrt(3 * A / (Math.PI * f)), s);
       o.radial = true; o.p = Pr; o.cell = Math.PI / 3 * Pr * Pr; o.bridge = Pr - s;
       o.hx = s / 2; o.hy = s / 2; o.max = A / (Math.PI / 3 * s * s);
       o.pitch = [["p", Pr]];
     } else if (pattern === "round-contour") {
       // Rows follow the perforated area's outline, offset inward by p each time; holes on a row are about p apart.
       // Each hole owns about p^2, so open area = A / p^2. The real smallest gap is measured after layout.
-      var Pc = r2(Math.sqrt(A / f));
+      var Pc = gridPitch(Math.sqrt(A / f), s);
       o.radial = true; o.p = Pc; o.cell = Pc * Pc; o.bridge = Pc - s;
       o.hx = s / 2; o.hy = s / 2; o.max = A / (s * s);
       o.pitch = [["p", Pc]];
@@ -680,7 +690,7 @@ td { font-size: 13px; }
       o.radial = true; o.band = true; o.f = f; o.cell = 1; o.bridge = 1;
       o.hx = L / 2; o.hy = L / 2; o.max = 1; o.pitch = [["g", 0]];
     } else if (pattern === "hex") {
-      var P = r2(s / Math.sqrt(f));
+      var P = gridPitch(s / Math.sqrt(f), s);
       o.cell = SQ3 / 2 * P * P; o.bridge = P - s; o.dx = P; o.dy = P * SQ3 / 2; o.off = P / 2;
       o.hx = s / 2; o.hy = s / SQ3; o.max = 1; o.pitch = [["p", P]];
     }
@@ -1582,10 +1592,10 @@ td { font-size: 13px; }
   // Stored area -> screen frame (y-down) for panel height H.
   function gS(H) {
     var a = G.area; if (!a) return null;
-    return { shape: a.shape, cx: a.cx, cy: a.cyS, hw: a.hw, hh: a.hh, rot: a.rot, r: a.r || 0 };
+    return { shape: a.shape, cx: a.cx, cy: a.cyS, hw: a.hw, hh: a.hh, rot: a.rot, r: a.r || 0, n: a.n || 2 };
   }
   function gSet(s, H) {
-    G.area = { shape: s.shape, cx: s.cx, cyS: s.cy, hw: Math.max(0.5, s.hw), hh: Math.max(0.5, s.hh), rot: s.rot, r: s.r || 0 };
+    G.area = { shape: s.shape, cx: s.cx, cyS: s.cy, hw: Math.max(0.5, s.hw), hh: Math.max(0.5, s.hh), rot: s.rot, r: s.r || 0, n: s.n || 2 };
   }
   // Screen point -> the area's own axes (x along its width, y along its height), origin at its centre.
   function gLocal(s, x, y) {
@@ -1600,10 +1610,22 @@ td { font-size: 13px; }
   // Internal hole position -> area-local point (G.H is the panel height the internal coords refer to).
   function gradLocal(x, y) { return gLocal(gS(G.H), x, G.H - y); }
   // Signed distance (mm) from area-local point q to a rectangle with corner radius a.r: negative inside.
+  // G2 / G3 corners (n > 2) are the panel's superellipse quarters: in the corner box the distance is to that curve.
   function gradSdf(a, q) {
     var r = Math.min(a.r || 0, a.hw, a.hh), bx = a.hw - r, by = a.hh - r;
-    var qx = Math.abs(q.x) - bx, qy = Math.abs(q.y) - by;
+    var qx = Math.abs(q.x) - bx, qy = Math.abs(q.y) - by, n = a.n || 2;
+    if (n !== 2 && r > 0 && qx > 0 && qy > 0) {
+      var dc = distToPolyline(qx, qy, cornerCurve(r, n));
+      return Math.pow(qx / r, n) + Math.pow(qy / r, n) <= 1 ? -dc : dc;
+    }
     return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r;
+  }
+  // A rounded rectangle centred on (cx, cy) with half sizes hw, hh, corner radius r and corner type n, as SVG.
+  function gradRectSVG(cls, cx, cy, hw, hh, r, n, extra) {
+    r = Math.min(r || 0, hw, hh);
+    if ((n || 2) === 2 || !(r > 0))
+      return '<rect class="' + cls + '"' + (extra || "") + ' x="' + (cx - hw) + '" y="' + (cy - hh) + '" width="' + (2 * hw) + '" height="' + (2 * hh) + '" rx="' + r + '"/>';
+    return '<path class="' + cls + '"' + (extra || "") + ' transform="translate(' + (cx - hw) + ' ' + (cy - hh) + ')" d="' + panelPathD({ W: 2 * hw, H: 2 * hh, Rc: r, n: n }) + '"/>';
   }
   // Distance outside the outline (mm), 0 inside.
   function gradDist(x, y) {
@@ -1622,7 +1644,7 @@ td { font-size: 13px; }
   function syncPanelArea(inp) {
     if (!G.panelMode || !G.on) return;
     var hw = Math.max(0.5, inp.W / 2 - G.offset), hh = Math.max(0.5, inp.H / 2 - G.offset);
-    G.area = { shape: "rect", cx: inp.W / 2, cyS: inp.H / 2, hw: hw, hh: hh, rot: 0, r: Math.min(Math.max(0, (inp.Rc || 0) - G.offset), hw, hh) };
+    G.area = { shape: "rect", cx: inp.W / 2, cyS: inp.H / 2, hw: hw, hh: hh, rot: 0, r: Math.min(Math.max(0, (inp.Rc || 0) - G.offset), hw, hh), n: CORNER_N[inp.corner] || 2 };
   }
   function gradMsg(t) {
     var el = $("gradMsg"); el.textContent = t;
@@ -1643,19 +1665,18 @@ td { font-size: 13px; }
     for (i = SHADE_N; i >= 1; i--) {
       var d = D * i / SHADE_N, rx = s.hw + d, ry = s.hh + d;
       if (s.shape === "ellipse") out += '<ellipse class="gradLayer" cx="' + s.cx + '" cy="' + s.cy + '" rx="' + rx + '" ry="' + ry + '"/>';
-      else out += '<rect class="gradLayer" x="' + (s.cx - rx) + '" y="' + (s.cy - ry) + '" width="' + (2 * rx) + '" height="' + (2 * ry) + '" rx="' + (Math.min(s.r || 0, s.hw, s.hh) + d) + '"/>';
+      else out += gradRectSVG("gradLayer", s.cx, s.cy, rx, ry, Math.min(s.r || 0, s.hw, s.hh) + d, s.n);
     }
     return out;
   }
   // The whole area in the artboard: a transparent hit shape (grabbed for moving) and, while fading, the band.
   function gradGroupSVG(s) {
     var tr = ' transform="rotate(' + s.rot + ' ' + s.cx + ' ' + s.cy + ')"';
-    var geo = s.shape === "ellipse"
-      ? 'cx="' + s.cx + '" cy="' + s.cy + '" rx="' + s.hw + '" ry="' + s.hh + '"'
-      : 'x="' + (s.cx - s.hw) + '" y="' + (s.cy - s.hh) + '" width="' + (2 * s.hw) + '" height="' + (2 * s.hh) + '" rx="' + Math.min(s.r || 0, s.hw, s.hh) + '"';
-    var tag = s.shape === "ellipse" ? "ellipse" : "rect";
     var grab = G.panelMode ? "" : ' data-g="body"';
-    return '<g' + tr + '><' + tag + ' class="gradArea"' + grab + ' ' + geo + '/>' + (G.fading ? gradShadeSVG(s) : "") + '</g>';
+    var body = s.shape === "ellipse"
+      ? '<ellipse class="gradArea"' + grab + ' cx="' + s.cx + '" cy="' + s.cy + '" rx="' + s.hw + '" ry="' + s.hh + '"/>'
+      : gradRectSVG("gradArea", s.cx, s.cy, s.hw, s.hh, s.r, s.n, grab);
+    return '<g' + tr + '>' + body + (G.fading ? gradShadeSVG(s) : "") + '</g>';
   }
   function isSquare(s) { return Math.abs(s.hw - s.hh) < 0.01; }
   // Move: the centre follows the pointer; within SNAP_MM of a panel centre line it locks onto that line until the
